@@ -32,5 +32,14 @@ module.exports = {
             response.send({"id_banco": results.rows[0].id_banco});
         });
 
+    },
+    async getAll(request, response) {
+        const query = 'SELECT * FROM banco_sangue';
+        await pool.query(query, (err, result) => {
+            if(err) {
+                return response.status(400).send(err);
+            }
+            return response.status(200).send(result.rows);
+        });
     }
 };

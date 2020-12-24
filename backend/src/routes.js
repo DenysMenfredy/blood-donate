@@ -15,17 +15,19 @@ routes.get('/', (req, res) => {
 
 routes.post('/donator', DonatorController.create);
 routes.get('/donator', DonatorController.index);
-routes.get('donator/numDonations', DonatorController.numDonations);
-routes.get('/donations/patients', DonatorController.getDonationsToPatients);
-routes.get('/donations/banks', DonatorController.getDonationsToBanks);
+routes.post('/donator/numDonations', DonatorController.numDonations);
+routes.post('/donator/getId', DonatorController.getId);
+routes.post('/donations/patients', DonatorController.getDonationsToPatients);
+routes.post('/donations/banks', DonatorController.getDonationsToBanks);
 
 routes.post('/login', DonatorController.login);
 
 routes.post('/patient', PatientController.create);
-routes.get('/patient/all', PatientController.getAll);
+routes.post('/patient/all', PatientController.getAll);
 
 routes.post('/banco', BloodBankController.create);
 routes.get('/banco/getId', BloodBankController.getId);
+routes.get('/banco/all', BloodBankController.getAll);
 
 routes.post('/doacao/banco', DonationController.donateToBank);
 routes.post('/doacao/paciente', DonationController.donateToPatient);

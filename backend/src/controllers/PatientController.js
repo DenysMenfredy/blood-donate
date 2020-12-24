@@ -9,15 +9,16 @@ module.exports = {
         await pool.query(query, (err, result) => {
             if (err) {
                 console.log(err);
-                return response.status(400).send("Erro ao adicionar paciente");
                 pool.end();
+                return response.status(400).send("Erro ao adicionar paciente");
             }
             return response.status(200).send("Paciente adicionado com sucesso")
         });
     },
 
     async getAll(request, response) {
-        const query = 'SELECT * FROM paciente';
+	const {donatorId} = request.body;
+        const query = {text:'SELECT * FROM get_patients($1)', values:[donatorId]};
         await pool.query(query, (err, result) => {
             if(err) {
                 return response.status(400).send(err);

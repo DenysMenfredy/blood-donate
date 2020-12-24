@@ -1,0 +1,121 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    font-family: 'Roboto', sans-serif;
+}
+
+html, body, section {
+    height: 100%;
+}
+
+div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.cad-container {
+    display: flex;
+    background-color: #ffffff;
+    height: 100vh;
+}
+
+.lh {
+    flex: 1;
+}
+
+.lh img {
+    width: 350px;
+    align-self: center;
+}
+
+.rh {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    flex: 1;
+    background-color: #222831;    
+}
+
+.cad-section {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 70%;
+}
+
+.cad-section h1 {
+    color: #ffffff;
+    font-size: 2em;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.cad-section form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-content: flex-start;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.cad-section form h4 {
+    color: #ffffff;
+    text-transform: uppercase;
+    font-size: 0.9em;
+    margin-bottom: 7px;
+}
+
+.cad-section div {
+    margin-bottom: 25px;
+}
+
+.cad-section form input {
+    border: none;
+    color: #ffffff;
+    border-bottom: 1px solid #a0a0a0;
+    outline: none;
+    font-size: 1em;
+    background: transparent;
+}
+
+.cad-section form input::placeholder {
+    /* margin-bottom: 3px; */
+    color: #A0A0A0;
+    text-transform: uppercase;
+    font-size:0.8em;
+}
+
+.cad-section form label {
+    color: #A0A0A0;
+}
+
+.cad-section form select {
+    background: transparent;
+    border: none;
+    color: #A0A0A0;
+    font-size: 1em;
+    outline: none;
+}
+
+.cad-section form select:focus {
+    border: none;
+    outline: none;
+}
+
+.cad-section form button {
+    width: 100%;
+    height: 32px;
+    background-color: #F05454;
+    color: #fff;
+    text-transform: uppercase;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-size: 1em;
+    border-radius: 3px;
+}
