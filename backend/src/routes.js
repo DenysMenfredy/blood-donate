@@ -1,5 +1,5 @@
 const express = require('express');
-const pool = require('./db_connection');
+const db = require('../db');
 
 const DonatorController = require('./controllers/DonatorController');
 const PatientController = require('./controllers/PatientController');
@@ -33,7 +33,7 @@ routes.post('/doacao/banco', DonationController.donateToBank);
 routes.post('/doacao/paciente', DonationController.donateToPatient);
 
 routes.get('/test', (req, res) => {
-    pool.query('SELECT * FROM endereco', (err, result) => {
+    db.query('SELECT * FROM endereco', [], (err, result) => {
         if(err) {
             console.log(err);
             res.status(400).send(err);

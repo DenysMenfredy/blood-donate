@@ -13,17 +13,18 @@ function Donations() {
     const [donations, setDonations] = useState([]);
     const [userInfo, setInfo] = useState('');
     const donatorId = localStorage.getItem('donatorId');
+    const username = localStorage.getItem('username');
     const [numDonations, setNumDonations] = useState('');
 
     useEffect(() => {
         api.get('/donator', { 
             headers: { 
-                Authorization: donatorId
+                Authorization: username
             }
         }).then(response => {
             setInfo(response.data);
         });
-    }, [donatorId]);
+    }, [username]);
 
     useEffect( () => {
         api.post('/donations/patients', {id:donatorId}).then(response => {

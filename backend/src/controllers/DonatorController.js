@@ -1,4 +1,4 @@
-const pool = require('../db_connection');
+const db = require('../../db');
 
 
 module.exports = {
@@ -7,15 +7,15 @@ module.exports = {
 
         const {nome, idade, sexo, username, senha, telefone, tipo_sanguineo} = request.body;
 	
-        const query = {text:'INSERT INTO doador (nome, idade, sexo, username, senha, telefone, tipo_sanguineo)VALUES($1, $2, $3, $4, $5, $6, $7);',
-                       values: [nome, idade, sexo, username, senha, telefone, tipo_sanguineo]};
-        
-        await pool.query(query, (err, result) => {
+        const query = 'INSERT INTO doador (nome, idade, sexo, username, senha, telefone, tipo_sanguineo)VALUES($1, $2, $3, $4, $5, $6, $7);';
+        const params = [nome, idade, sexo, username, senha, telefone, tipo_sanguineo]
+
+        await db.query(query, params, (err, result) => {
             if(err) {
                 console.log(err);
                 return response.status(400).send("Erro ao adicionar dados");
                 // console.log(query);
-                // pool.end();
+                // db.end();
             }
                 return response.status(200).send("Adicionado com sucesso");
         });
@@ -30,7 +30,7 @@ module.exports = {
         // console.log(username, password);
 
         try {
-            const {rows} = await pool.query(query, [username]);
+            const {rows} = await db.query(query, [username]);
             if(!rows[0]) {
                 return res.status(404).send({"message": "Username não encontrado"});
             }
@@ -52,20 +52,19 @@ module.exports = {
         const userName = req.headers.authorization;
         // console.log(userName);
         const query = 'SELECT * FROM doador WHERE username=$1';
-        const {rows} = await pool.query(query, [userName]);
+        const {rows} = await db.query(query, [userName]);
         // console.log(rows[0])
         return res.status(200).send(rows[0]);
     },
 
     async getId(request, response) {
         const {username} = request.body;
-        const query = {text: 'SELECT id_doador FROM doador WHERE username=$1',
-                       values:[username]};
+        const query = 'SELECT id_doador FROM doador WHERE username=$1';
 
         // console.log(query);
-        await pool.query(query, (err, results) => {
+        await db.query(query, [userName], (err, results) => {
             if(err) {
-                // pool.end();
+                // db.end();
                 return response.status(400).send(err);
             }
             // console.log(results.rows[0].id_doador);
@@ -76,10 +75,9 @@ module.exports = {
 
     async getDonationsToPatients(request, response) {
         const {id} = request.body;
-        const query = {text: 'SELECT dp.id, p.nome, p.tipo_sanguineo, p.motivo, p.sexo, p.idade, dp.data_doacao::DATE AS data_doacao FROM doacao_paciente dp INNER JOIN paciente p ON dp.id_paciente=p.id_paciente WHERE id_doador=$1 ORDER BY data_doacao;',
-                       values:[id]};
+        const query = 'SELECT dp.id, p.nome, p.tipo_sanguineo, p.motivo, p.sexo, p.idade, dp.data_doacao::DATE AS data_doacao FROM doacao_paciente dp INNER JOIN paciente p ON dp.id_paciente=p.id_paciente WHERE id_doador=$1 ORDER BY data_doacao;';
 
-        await pool.query(query, (err, results) => {
+        await db.query(query, [id], (err, results) => {
             if(err) {
             //   console.log(err);
               return response.status(400).send(err);
@@ -96,10 +94,9 @@ module.exports = {
 
     async getDonationsToBanks(request, response) {
         const {id} = request.body;
-        const query = {text: 'SELECT db.id, b.nome, b.endereco, b.cidade, b.uf, b.telefone, db.data_doacao FROM doacao_banco db INNER JOIN banco_sangue b ON db.id_banco_sangue=b.id_banco WHERE id_doador=$1 ORDER BY data_doacao;',
-                       values:[id]};
+        const query = 'SELECT db.id, b.nome, b.endereco, b.cidade, b.uf, b.telefone, db.data_doacao FROM doacao_banco db INNER JOIN banco_sangue b ON db.id_banco_sangue=b.id_banco WHERE id_doador=$1 ORDER BY data_doacao;';
 
-        await pool.query(query, (err, results) => {
+        await db.query(query, [id], (err, results) => {
             if(err) {
                 return response.status(400).send(err);
             }
@@ -110,10 +107,9 @@ module.exports = {
 
     async numDonations(request, response) {
         const {donatorId} = request.body;
-        const query = {text: 'SELECT * FROM num_donations($1);',
-                       values: [donatorId]};
+        const query = 'SELECT * FROM num_donations($1);';
         
-        await pool.query(query, (err, results) => {
+        await db.query(query, [donatorId], (err, results) => {
             if (err) {
                 return response.status(400).send(err);
             }
