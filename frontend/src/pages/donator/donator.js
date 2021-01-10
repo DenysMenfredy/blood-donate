@@ -10,7 +10,8 @@ import {BiDonateBlood} from 'react-icons/bi';
 
 function Donator() {
     const history = useHistory();
-    const [userInfo, setInfo] = useState('');
+    const [userInfo, setInfo] = useState({});
+    const username = localStorage.getItem('username');
     const donatorId = localStorage.getItem('donatorId');
     const [patients, setPatients] = useState([]);
     const [numDonations, setNumDonations] = useState('');
@@ -18,12 +19,12 @@ function Donator() {
     useEffect(() => {
         api.get('/donator', { 
             headers: { 
-                Authorization: donatorId
+                Authorization: username
             }
         }).then(response => {
             setInfo(response.data);
         });
-    }, [donatorId]);
+    }, [username]);
 
    useEffect( () => {
         api.post('/patient/all', {donatorId}).then(response => {

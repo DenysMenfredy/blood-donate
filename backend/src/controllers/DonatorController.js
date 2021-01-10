@@ -13,55 +13,63 @@ module.exports = {
         await pool.query(query, (err, result) => {
             if(err) {
                 console.log(err);
-                response.status(400).send("Erro ao adicionar dados");
+                return response.status(400).send("Erro ao adicionar dados");
                 // console.log(query);
-                pool.end();
+                // pool.end();
             }
-                response.status(200).send("Adicionado com sucesso");
+                return response.status(200).send("Adicionado com sucesso");
         });
 
     },
 
     async login(req, res) {
+        // req.session.name = 'hello';
+        
         const {username, password} = req.body;
         const query = 'SELECT * FROM doador WHERE username=$1';
-        console.log(username, password);
+        // console.log(username, password);
 
         try {
             const {rows} = await pool.query(query, [username]);
             if(!rows[0]) {
-                return res.status(400).send({"message": "Username não encontrado"});
+                return res.status(404).send({"message": "Username não encontrado"});
             }
             if(rows[0].senha != password) {
-                return res.status(400).send({"message": "Senha incorreta"});
+                return res.status(404).send({"message": "Senha incorreta"});
             }
-            return res.status(200).send({"id_doador": rows[0].id_doador});
+            req.session.loggedin = true;
+            req.session.username = username;
+            // console.log(req.session);
+            return res.status(200).send({"userInfo": {"id":rows[0].id_doador, 
+                                                      "username":req.session.username}});
         } catch(err) {
             return res.status(400).send(err)
         }
     },
 
     async index(req, res) {
-        const donatorId = req.headers.authorization;
-        const query = 'SELECT * FROM doador WHERE id_doador=$1';
-        const {rows} = await pool.query(query, [donatorId]);
+        // console.log(req.headers)
+        const userName = req.headers.authorization;
+        // console.log(userName);
+        const query = 'SELECT * FROM doador WHERE username=$1';
+        const {rows} = await pool.query(query, [userName]);
         // console.log(rows[0])
         return res.status(200).send(rows[0]);
     },
 
     async getId(request, response) {
         const {username} = request.body;
-        const query = {text: 'SELECT * FROM doador WHERE username=$1',
+        const query = {text: 'SELECT id_doador FROM doador WHERE username=$1',
                        values:[username]};
 
         // console.log(query);
         await pool.query(query, (err, results) => {
             if(err) {
-                response.status(400).send(err);
-                pool.end();
+                // pool.end();
+                return response.status(400).send(err);
             }
-            console.log(results.rows[0].id_doador);
-            response.send({"id_doador": results.rows[0].id_doador});
+            // console.log(results.rows[0].id_doador);
+            return response.send({"id_doador": results.rows[0].id_doador});
         });
 
     },
@@ -93,9 +101,9 @@ module.exports = {
 
         await pool.query(query, (err, results) => {
             if(err) {
-                response.status(400).send(err);
+                return response.status(400).send(err);
             }
-            response.status(200).send(results.rows);
+            return response.status(200).send(results.rows);
         });
         
     },
@@ -107,9 +115,9 @@ module.exports = {
         
         await pool.query(query, (err, results) => {
             if (err) {
-                response.status(400).send(err);
+                return response.status(400).send(err);
             }
-            response.status(200).send({"num_donations":results.rows[0].num_donations});
+            return response.status(200).send({"num_donations":results.rows[0].num_donations});
 	    //console.log(results.rows[0]);
         });
     }

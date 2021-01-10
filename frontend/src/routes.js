@@ -7,6 +7,7 @@ import Donator from './pages/donator/donator.js'
 import DonatorBank from './pages/donatorBank/donatorBank.js';
 import Donations from './pages/donations/donations.js';
 import BankDonations from './pages/bankDonations/bankDonations.js';
+import NotFoundPage from './pages/notFoundPage/notFoundPage.js';
 
 export default function Routes() {
     return (
@@ -18,6 +19,7 @@ export default function Routes() {
                 <Route path="/donations" exact component={Donations} />
                 <Route path="/donations/banks" exact component={BankDonations} />
                 <Route path="/cadastro" exact component={Cadastro} />
+                <Route path="/404" exact component={NotFoundPage} />
             </Switch>
         </BrowserRouter>
     );

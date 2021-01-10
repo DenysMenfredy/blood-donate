@@ -30,13 +30,22 @@ function Cadastro() {
                 senha,
                 telefone,
                 tipo_sanguineo
+            }).then( (response) => {
+                if (response.status === 200) {
+                    api.post('/login', {username, password:senha}).then( (response) => {
+                        if (response.status === 200) {
+                            // const response = await api.post('/donator/getId', {username});
+                            localStorage.setItem('donatorId', response.data.userInfo.id);
+                            localStorage.setItem('username', response.data.userInfo.username);
+                            history.push('/donator');
+                        }
+                        // const donatorId = response.data.id_doador;
+                    })
+                }
             })
-            const response = await api.post('/donator/getId', {username});
-            const donatorId = response.data.id_doador;
-            console.log(donatorId);
-            localStorage.setItem('donatorId', donatorId);
+            // console.log(donatorId);
 
-            history.push('/donator');
+            // history.push('/donator');
         }catch(err) {
             console.log("Falha ao cadastrar doador");
         }

@@ -8,15 +8,15 @@ function PersonToDonate(props) {
     // console.log(id_doador);
     const [data, setData] = useState('');
 
-    async function makeDonation(e, patient_id, data) { 
+    async function makeDonation(e, patientId, data) { 
         e.preventDefault();
-        console.log(patient_id);
-        const id_doador = localStorage.getItem('donatorId');
+        // console.log(patientId);
+        const idDoador = localStorage.getItem('donatorId');
         // localStorage.setItem('PatientId', patient_id);
         // const id_patient = localStorage.getItem('PatientId');
         const response = await api.post('/doacao/paciente', {
-            donatorId:id_doador, 
-            patientId:patient_id,
+            donatorId:idDoador, 
+            patientId:patientId,
             data:data 
         });
         alert(response.data);

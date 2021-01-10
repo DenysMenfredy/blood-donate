@@ -14,11 +14,9 @@ function BankToDonate(props) {
         // localStorage.setItem('BankId', bank_id);
         // const id_patient = localStorage.getItem('BankId');
         const response = await api.post('/doacao/banco', {
-            data: {
                     donatorId:id_doador, 
                     bankId:id_banco,
                     data:data 
-                  }
         });
         alert(response.data);
 

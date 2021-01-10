@@ -20,9 +20,9 @@ function Login() {
 
         try {
             const response = await api.post('login', {username, password});
-            console.log(response);
-            localStorage.setItem('donatorId', response.data.id_doador);
-
+            // console.log(response);
+            localStorage.setItem('donatorId', response.data.userInfo.id);
+            localStorage.setItem('username', response.data.userInfo.username);
             history.push('/donator');
         } catch(err) {
             alert("Falha no login, tente novamente.")
