@@ -5,7 +5,7 @@ import api from '../../services/api';
 import './bankDonations.css';
 import DonationToBank from '../../components/donationToBank';
 import avatar from '../../assets/blood-avatar-men.png';
-import {FiLogOut} from 'react-icons/fi';
+import {FiEdit, FiLogOut} from 'react-icons/fi';
 import {BiDonateBlood} from 'react-icons/bi';
 
 function BankDonations() {
@@ -65,6 +65,10 @@ function BankDonations() {
                         <li>
                             <BiDonateBlood size="20px" /> 
                             <Link to="/donations"> Minhas doações</Link>
+                        </li>
+                        <li>
+                            <FiEdit size="20px" />
+                            <Link to="#">Editar perfil</Link>
                         </li>
                         <li>
                             <FiLogOut size="20px" />

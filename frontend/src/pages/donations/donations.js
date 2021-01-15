@@ -70,6 +70,10 @@ function Donations() {
                             <Link to="/donations"> Minhas doações</Link>
                         </li>
                         <li>
+                            <FiEdit size="20px" />
+                            <Link to="#">Editar perfil</Link>
+                        </li>
+                        <li>
                             <FiLogOut size="20px" />
                             <Link to="/" onClick={handleLogout}>Sair da conta</Link>
                         </li>

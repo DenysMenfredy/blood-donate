@@ -51,10 +51,13 @@ module.exports = {
         // console.log(req.headers)
         const userName = req.headers.authorization;
         // console.log(userName);
-        const query = 'SELECT * FROM doador WHERE username=$1';
-        const {rows} = await db.query(query, [userName]);
+        const query = 'SELECT nome, tipo_sanguineo, sexo FROM doador WHERE username=$1';
+        const response = await db.query(query, [userName]);
         // console.log(rows[0])
-        return res.status(200).send(rows[0]);
+        if (!response) {
+            return res.status(400).json({error: "User not found"});
+        }
+        return res.json(response.rows[0]);
     },
 
     async getId(request, response) {

@@ -22,6 +22,7 @@ function Donator() {
                 Authorization: username
             }
         }).then(response => {
+            console.log(response);
             setInfo(response.data);
         });
     }, [username]);
@@ -62,6 +63,10 @@ function Donator() {
                         <li>
                             <BiDonateBlood size="20px" /> 
                             <Link to="/donations"> Minhas doações</Link>
+                        </li>
+                        <li>
+                            <FiEdit size="20px" />
+                            <Link to="#">Editar perfil</Link>
                         </li>
                         <li>
                             <FiLogOut size="20px" />

@@ -23,6 +23,7 @@ function Login() {
             // console.log(response);
             localStorage.setItem('donatorId', response.data.userInfo.id);
             localStorage.setItem('username', response.data.userInfo.username);
+            
             history.push('/donator');
         } catch(err) {
             alert("Falha no login, tente novamente.")

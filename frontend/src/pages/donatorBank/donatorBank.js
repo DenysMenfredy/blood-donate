@@ -12,18 +12,19 @@ function DonatorBank() {
     const history = useHistory();
     const [userInfo, setInfo] = useState('');
     const donatorId = localStorage.getItem('donatorId');
+    const username  = localStorage.getItem('username');
     const [bancos, setBancos] = useState([]);
     const [numDonations, setNumDonations] = useState('');
 
     useEffect(() => {
         api.get('donator', { 
             headers: { 
-                Authorization: donatorId
+                Authorization: username
             }
         }).then(response => {
             setInfo(response.data);
         });
-    }, [donatorId]);
+    }, [username]);
 
    useEffect( () => {
         api.get('/banco/all').then(response => {
@@ -60,6 +61,10 @@ function DonatorBank() {
                         <li>
                             <BiDonateBlood size="20px" /> 
                             <Link to="/donations"> Minhas doações</Link>
+                        </li>
+                        <li>
+                            <FiEdit size="20px" />
+                            <Link to="#">Editar perfil</Link>
                         </li>
                         <li>
                             <FiLogOut size="20px" />
