@@ -1,6 +1,6 @@
 const express = require('express');
-const db = require('../db');
-
+const db = require('./db/connection');
+// const verifyJWT = require("./utils/verificaJWT");
 const DonatorController = require('./controllers/DonatorController');
 const PatientController = require('./controllers/PatientController');
 const BloodBankController = require('./controllers/BloodBankController');
