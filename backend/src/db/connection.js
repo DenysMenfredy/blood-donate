@@ -11,7 +11,6 @@ const connectionInfo = {
     database: process.env.DB,
 }
 
-console.log(connectionInfo);
 
 const pool = new Pool(connectionInfo);
 

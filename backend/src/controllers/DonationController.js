@@ -30,7 +30,6 @@ module.exports = {
         await db.query(query, [donatorId, patientId, data], (err, results) => {
             if(err) {
                 // console.log(err);
-                db.end();
                 return response.status(502).send("Erro ao adicionar doação");
             }
                 return response.status(200).send("Doação realizada");

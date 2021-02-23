@@ -1,4 +1,6 @@
 const db = require('../db/connection');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 module.exports = {
 
@@ -6,7 +8,7 @@ module.exports = {
 
         const {nome, idade, sexo, username, senha, telefone, tipo_sanguineo} = request.body;
 	
-        const query = 'INSERT INTO doador (nome, idade, sexo, username, senha, telefone, tipo_sanguineo)VALUES($1, $2, $3, $4, $5, $6, $7);';
+        const query = 'CALL insert_doador($1, $2, $3, $4, $5, $6, $7);';
         const params = [nome, idade, sexo, username, senha, telefone, tipo_sanguineo]
 
         await db.query(query, params, (err, result) => {
@@ -27,31 +29,27 @@ module.exports = {
         const {username, password} = req.body;
         const query = 'SELECT * FROM doador WHERE username=$1';
         // console.log(username, password);
+        const SECRET_KEY = 'strongUniqueAndRandom';
+        const data = [username, password]
 
-        try {
-            const {rows} = await db.query(query, [username]);
-            if(!rows[0]) {
-                return res.status(404).send({"message": "Username não encontrado"});
+        db.query(query, data, (err, result) => {
+            if(err) {
+                console.log(err);
+                return res.status(400).send("Erro ao fazer login");
+            } else {
+                console.log(result);
+                return res.status(200).send("OK");
             }
-            if(rows[0].senha != password) {
-                return res.status(404).send({"message": "Senha incorreta"});
-            }
-            req.session.loggedin = true;
-            req.session.username = username;
-            // console.log(req.session);
-            return res.status(200).send({"userInfo": {"id":rows[0].id_doador, 
-                                                      "username":req.session.username}});
-        } catch(err) {
-            return res.status(400).send(err)
-        }
+
+        });
     },
 
     async index(req, res) {
         // console.log(req.headers)
-        const userName = req.headers.authorization;
+        const username = req.headers.authorization;
         // console.log(userName);
         const query = 'SELECT nome, tipo_sanguineo, sexo FROM doador WHERE username=$1';
-        const response = await db.query(query, [userName]);
+        const response = await db.query(query, [username]);
         // console.log(rows[0])
         if (!response) {
             return res.status(400).json({error: "User not found"});
@@ -64,7 +62,7 @@ module.exports = {
         const query = 'SELECT id_doador FROM doador WHERE username=$1';
 
         // console.log(query);
-        await db.query(query, [userName], (err, results) => {
+        await db.query(query, [username], (err, results) => {
             if(err) {
                 // db.end();
                 return response.status(400).send(err);
@@ -77,7 +75,7 @@ module.exports = {
 
     async getDonationsToPatients(request, response) {
         const {id} = request.body;
-        const query = 'SELECT dp.id, p.nome, p.tipo_sanguineo, p.motivo, p.sexo, p.idade, dp.data_doacao::DATE AS data_doacao FROM doacao_paciente dp INNER JOIN paciente p ON dp.id_paciente=p.id_paciente WHERE id_doador=$1 ORDER BY data_doacao;';
+        const query = 'SELECT * FROM doacoes_paciente($1);';
 
         await db.query(query, [id], (err, results) => {
             if(err) {
@@ -88,7 +86,7 @@ module.exports = {
            if (results.rows.length > 0) {
                return response.status(200).send(results.rows);
            } else {
-               return response.status(204);
+               return response.status(204).send('No donations');
            }
            
         });
@@ -96,7 +94,7 @@ module.exports = {
 
     async getDonationsToBanks(request, response) {
         const {id} = request.body;
-        const query = 'SELECT db.id, b.nome, b.endereco, b.cidade, b.uf, b.telefone, db.data_doacao FROM doacao_banco db INNER JOIN banco_sangue b ON db.id_banco_sangue=b.id_banco WHERE id_doador=$1 ORDER BY data_doacao;';
+        const query = 'SELECT * FROM doacoes_banco($1);';
 
         await db.query(query, [id], (err, results) => {
             if(err) {

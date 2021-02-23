@@ -19,12 +19,25 @@ function Login() {
         e.preventDefault();
 
         try {
-            const response = await api.post('login', {username, password});
+            // const response = await api.post('login', {username, password});
+            await api.post('login', {
+                username, password
+            })
+            .then((response) => {
+                if(response.status === 200) {
+                    sessionStorage.setItem('token', response.data.token);
+                    history.push('/donator');
+                } else {
+                    sessionStorage.removeItem('token');
+                }
+            }).catch((error) => {
+                sessionStorage.removeItem('token');
+            });
             // console.log(response);
-            localStorage.setItem('donatorId', response.data.userInfo.id);
-            localStorage.setItem('username', response.data.userInfo.username);
+            //localStorage.setItem('donatorId', response.data.userInfo.id);
+            //localStorage.setItem('username', response.data.userInfo.username);
             
-            history.push('/donator');
+            
         } catch(err) {
             alert("Falha no login, tente novamente.")
         }
