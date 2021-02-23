@@ -21,6 +21,7 @@ routes.post('/donations/patients', DonatorController.getDonationsToPatients);
 routes.post('/donations/banks', DonatorController.getDonationsToBanks);
 
 routes.post('/login', DonatorController.login);
+routes.post('/validate', DonatorController.validate);
 
 routes.post('/patient', PatientController.create);
 routes.post('/patient/all', PatientController.getAll);

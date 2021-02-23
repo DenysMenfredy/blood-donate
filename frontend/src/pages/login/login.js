@@ -29,6 +29,7 @@ function Login() {
                     history.push('/donator');
                 } else {
                     sessionStorage.removeItem('token');
+                    alert('Falha ao fazer login');
                 }
             }).catch((error) => {
                 sessionStorage.removeItem('token');

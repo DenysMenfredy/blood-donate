@@ -27,29 +27,58 @@ module.exports = {
         // req.session.name = 'hello';
         
         const {username, password} = req.body;
-        const query = 'SELECT * FROM doador WHERE username=$1';
+        const query = 'SELECT * FROM doador WHERE username=$1 AND senha=$2';
         // console.log(username, password);
         const SECRET_KEY = 'strongUniqueAndRandom';
         const data = [username, password]
 
-        db.query(query, data, (err, result) => {
+        await db.query(query, data, (err, result) => {
             if(err) {
                 console.log(err);
                 return res.status(400).send("Erro ao fazer login");
-            } else {
-                console.log(result);
-                return res.status(200).send("OK");
             }
+
+            if(!result.rows[0]) {
+                return res.status(404).json({ message: "User not found"});
+            }
+
+            const {id_doador} = result.rows[0];
+            
+            const payload = {
+                sub: id_doador,
+                iat: new Date().getTime()
+            };
+
+            const token = jwt.sign(payload, SECRET_KEY);
+            return res.status(200).json({ token });
+
 
         });
     },
 
+    async validate(req, res) {
+        const SECRET_KEY = 'strongUniqueAndRandom';
+        const bearer = req.headers.authorization;
+        const [, token] = bearer.split(' ');
+
+        const payload = jwt.verify(token, SECRET_KEY);
+
+        if(payload) {
+            console.log(payload);
+            return res.send(200).json( {message: "User authenticated with sucess",
+                                        id: payload.sub}
+                                        );
+        }
+
+        return res.send(400).send( {message: "Error in authentication..."} );
+
+    },
+
     async index(req, res) {
         // console.log(req.headers)
-        const username = req.headers.authorization;
-        // console.log(userName);
-        const query = 'SELECT nome, tipo_sanguineo, sexo FROM doador WHERE username=$1';
-        const response = await db.query(query, [username]);
+        const {donatorId} = req.body;
+        const query = 'SELECT nome, tipo_sanguineo, sexo FROM doador WHERE id_doador=$1';
+        const response = await db.query(query, [donatorId]);
         // console.log(rows[0])
         if (!response) {
             return res.status(400).json({error: "User not found"});

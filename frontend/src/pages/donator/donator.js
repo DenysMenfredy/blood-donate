@@ -12,20 +12,44 @@ function Donator() {
     const history = useHistory();
     const [userInfo, setInfo] = useState({});
     const username = localStorage.getItem('username');
-    const donatorId = localStorage.getItem('donatorId');
+    const [donatorId, setDonatorId] = useState(null);
     const [patients, setPatients] = useState([]);
     const [numDonations, setNumDonations] = useState('');
 
-    useEffect(() => {
-        api.get('/donator', { 
+    function handleTokenValidation() {
+        const token = sessionStorage.getItem('token');
+        const config = {
             headers: { 
-                Authorization: username
+                'Authorization': `Bearer ${token}`
             }
-        }).then(response => {
+        };
+
+        api.post('/validate', {}, config)
+        .then((response) => {
+            if(response.status === 200) {
+                console.log(response.data);
+                setDonatorId(response.data.id);
+            } else {
+                setTimeout(() => {
+                    history.push('/403');   
+                }, 5000);
+                history.push('/')
+            }  
+        })
+        .catch((error) => {
+            console.log(error);
+        })
+    }
+
+    useEffect(() => {
+        handleTokenValidation();
+
+        api.get('/donator', { donatorId })
+        .then(response => {
             console.log(response);
             setInfo(response.data);
         });
-    }, [username]);
+    }, [donatorId]);
 
    useEffect( () => {
         api.post('/patient/all', {donatorId}).then(response => {
@@ -45,6 +69,7 @@ function Donator() {
     function handleLogout(e) {
         e.preventDefault();
         localStorage.clear();
+        sessionStorage.clear();
         history.push('/');
     }
 
