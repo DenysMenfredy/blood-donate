@@ -14,13 +14,24 @@ module.exports = (sequelize, DataTypes) => {
         }
     };
     Patient.init({
-        patientId: DataTypes.UUID,
+        patientId:{
+            type: DataTypes.UUID,
+            primaryKey: true,
+            defaultValue: DataTypes.UUIDV4,
+        },
         userId: DataTypes.UUID,
         reason: DataTypes.TEXT,
+        createdAt: DataTypes.DATE,
+        updatedAt: DataTypes.DATE,
     }, {
         sequelize,
         modelName: 'Patient',
+        tableName: 'patient',
     });
+    // Patient.sync({
+    //     force: false,
+    //     alter: true,
+    // });
     return Patient;
 
 };

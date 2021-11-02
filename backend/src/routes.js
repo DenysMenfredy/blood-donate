@@ -7,14 +7,14 @@ const BloodBankController = require('./controllers/BloodBankController');
 const DonationController = require('./controllers/DonationController');
 const routes = express.Router();
 
-// client.connect();
+// TODO: Implement routes in controllers and use them here
 
 routes.get('/', (req, res) => {
-    res.send('Hello World');
+    res.send({'message':'Hello World'});
 })
 
 routes.post('/donator', DonatorController.create);
-routes.get('/donator', DonatorController.index);
+routes.get('/donator/:donatorId', DonatorController.index);
 routes.post('/donator/getId', DonatorController.getId);
 // routes.post('/donator/numDonations', DonatorController.numDonations);
 // routes.post('/donations/patients', DonatorController.getDonationsToPatients);

@@ -1,29 +1,43 @@
 // const {sequelize} = require('../db/connection');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const { Donator } = require('../models/donator.js');
+const db  = require('../../models');
 
+const SECRET_KEY = 'strongUniqueAndRandom';
 
 module.exports = {
 
     async create(request, response) {
         console.log(request.body);
-        const {nome, dataNascimento, sexo, username, senha, telefone, tipo_sanguineo} = request.body;
+        const {nome, dataNascimento, sexo, username, password, telefone, tipo_sanguineo} = request.body;
 	
         // const query = 'CALL insert_doador($1, $2, $3, $4, $5, $6, $7);';
         // const params = [nome, idade, sexo, username, senha, telefone, tipo_sanguineo]
 
-        const user = await Donator.create({
+        const user = await db.User.create({
             name: nome,
             birthDate: new Date(dataNascimento),
-            username: username,
-            password: senha,
             sex: sexo,
             bloodType: tipo_sanguineo,
             phone: telefone
         });
+        if(user) {
+            console.log(user);
+            const donator = await db.Donator.create({
+                userId: user.userId,
+                username: username,
+                password: password
+            });
+            console.log('Donator:', donator);
+            if(donator) {
+                console.log('Donator created');
+                return response.status(201).json(donator);
+            }
+        } else {
+            console.log('User not created');
+            response.status(500).send('User not created');
+        }        
 
-        console.log('User:', user);
 
     },
 
@@ -31,74 +45,70 @@ module.exports = {
         // req.session.name = 'hello';
         
         const {username, password} = req.body;
-        const query = 'SELECT * FROM doador WHERE username=$1 AND senha=$2';
-        // console.log(username, password);
-        const SECRET_KEY = 'strongUniqueAndRandom';
-        const data = [username, password]
-
-        const user = await Donator.findOne({
+        
+        const donator = await db.Donator.findOne({
             where: {
                 username: username,
                 password: password
             }
         });
-
-        console.log('User:', user);
-
-        // await db.query(query, data, (err, result) => {
-        //     if(err) {
-        //         console.log(err);
-        //         return res.status(400).send("Erro ao fazer login");
-        //     }
-
-        //     if(!result.rows[0]) {
-        //         return res.status(404).json({ message: "User not found"});
-        //     }
-
-        //     const {id_doador} = result.rows[0];
-            
-        //     const payload = {
-        //         sub: id_doador,
-        //         iat: new Date().getTime()
-        //     };
-
-        //     const token = jwt.sign(payload, SECRET_KEY);
-        //     return res.status(200).json({ token });
-        // });
+        if(donator) {
+            const token = jwt.sign({
+                donatorId: donator.userId,
+                username: donator.username,
+                password: donator.password
+            }, SECRET_KEY, {
+                expiresIn: '2m'
+            });
+            return res.status(200).json({
+                message: 'Logged in',
+                token: token,
+                expiresIn: 120
+            });
+        } else {
+            return res.status(401).json({
+                message: 'Invalid credentials'
+            });
+        }
+        
     },
 
     async validate(req, res) {
-        const SECRET_KEY = 'strongUniqueAndRandom';
+        // console.log(req.headers);
         const bearer = req.headers.authorization;
         const [, token] = bearer.split(' ');
+        // console.log(token);
 
-        const payload = jwt.verify(token, SECRET_KEY);
-
-        if(payload) {
+        try {
+            const payload = jwt.verify(token, SECRET_KEY);
             console.log(payload);
-            return res.send(200).json( {message: "User authenticated with sucess",
-                                        id: payload.sub}
-                                        );
+            return res.status(200).json(payload);
+        } catch(err) {
+            return res.status(401).json({
+                message: 'Invalid token'
+            });
         }
-
-        return res.send(400).send( {message: "Error in authentication..."} );
 
     },
 
-    async index(req, res) {
-        // console.log(req.headers)
-        const {donatorId} = req.body;
-        const query = 'SELECT nome, tipo_sanguineo, sexo FROM doador WHERE id_doador=$1';
-        // const response = await db.query(query, [donatorId]);
-        // console.log(rows[0])
 
-        const user = await Donator.findOne({
+    async index(req, res) {
+        // console.log(req.params);
+        const {donatorId} = req.params;
+        console.log(donatorId);
+
+        const donator = await db.Donator.findOne({
             where: {
-                id: donatorId
+                donatorId: donatorId
             }
         });
 
-        console.log(user);
+        if (donator) {
+            console.log(donator);
+            return res.status(200).json(donator);
+        }
+
+        return res.status(404).send('Donator not found');
 
         // if (!response) {
         //     return res.status(400).json({error: "User not found"});
@@ -107,28 +117,21 @@ module.exports = {
     },
 
     async getId(request, response) {
+        console.log(request.body);
         const {username} = request.body;
-        const query = 'SELECT id_doador FROM doador WHERE username=$1';
 
-        // console.log(query);
-
-        const donatorId = await Donator.findOne({
-            attributes: ['id'],
+        const donatorId = await db.Donator.findOne({
+            attributes: ['donatorId'],
             where: {
                 username: username
             }
         });
 
-        console.log('Id:', donatorId);
+        if (donatorId) {
+            return response.status(200).json(donatorId);
+        }
 
-        // await db.query(query, [username], (err, results) => {
-        //     if(err) {
-        //         // db.end();
-        //         return response.status(400).send(err);
-        //     }
-        //     // console.log(results.rows[0].id_doador);
-        //     return response.send({"id_doador": results.rows[0].id_doador});
-        // });
+        return response.status(404).send('Donator not found');
 
     }
 

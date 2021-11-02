@@ -15,7 +15,7 @@ module.exports = {
         allowNull: false,
         foreignKey: true,
         references: {
-          model: 'user',
+          model: 'User',
           key: 'userId',
         }
       },
@@ -27,6 +27,16 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.NOW
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.NOW
+      }
     });
   },
 

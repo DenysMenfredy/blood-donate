@@ -11,16 +11,26 @@ module.exports = (sequelize, DataTypes) => {
         }
     };
     BloodBank.init({
-        id: DataTypes.UUID,
+        id: {
+            type: DataTypes.UUID,
+            primaryKey: true,
+            defaultValue: DataTypes.UUIDV4
+        },
         name: DataTypes.STRING,
         address: DataTypes.STRING,
         city: DataTypes.STRING,
         state: DataTypes.STRING,
         phone: DataTypes.STRING,
+        createdAat: DataTypes.DATE,
+        updatedAat: DataTypes.DATE,
     }, {
         sequelize,
         modelName: 'BloodBank',
+        tableName: 'blood_bank',
     });
-    
+    // BloodBank.sync({
+    //     force: false,
+    //     alter: true
+    // })
     return BloodBank;
 };
