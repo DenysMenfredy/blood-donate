@@ -35,7 +35,7 @@ module.exports = {
             }
         } else {
             console.log('User not created');
-            response.status(500).send('User not created');
+            return response.status(500).send('User not created');
         }        
 
 

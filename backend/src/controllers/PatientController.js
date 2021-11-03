@@ -1,31 +1,43 @@
-const db = require('../db/connection');
+const db = require('../../models');
 
 module.exports = {
     async create(request, response) {
-        const {nome, idade, sexo, tipo_sanguineo, motivo} = request.body;
-        const query = 'INSERT INTO paciente (nome, idade, sexo, tipo_sanguineo, motivo) VALUES ($1, $2, $3, $4, $5)';
-        const params = [nome, idade, sexo, tipo_sanguineo, motivo];
-
-        await db.query(query, params, (err, result) => {
-            if (err) {
-                console.log(err);
-                db.end();
-                return response.status(400).send("Erro ao adicionar paciente");
-            }
-            return response.status(200).send("Paciente adicionado com sucesso")
+        console.log(request.body);
+        const {name, birthDate, sex, bloodType, phone, reason} = request.body;
+        
+        const user = await db.User.create({
+            name: name,
+            birthDate: new Date(birthDate),
+            sex: sex,
+            bloodType: bloodType,
+            phone: phone,
         });
+        if(user) {
+            const patient = await db.Patient.create({
+                userId: user.userId,
+                reason: reason
+            });
+            if(patient) {
+                return response.status(201).json({
+                    success: true,
+                });
+            } else {
+                return response.status(500).json({
+                    success: false,
+                    message: 'Error creating patient'
+                });
+            }
+        } else {
+            return response.status(500).json({
+                error: 'User not created'
+            });
+        }
     },
 
     async getAll(request, response) {
-	const {donatorId} = request.body;
-        const query = 'SELECT * FROM get_patients($1)';
+        const {donatorId} = request.body;
 
-        await db.query(query, [donatorId], (err, result) => {
-            if(err) {
-                return response.status(400).send(err);
-            }
-            return response.status(200).send(result.rows);
-        });
+        // Remember what is the purpose of this query?
     }
 
 };
