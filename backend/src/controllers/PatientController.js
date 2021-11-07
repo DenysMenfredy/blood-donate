@@ -1,5 +1,6 @@
 const db = require('../../models');
 
+
 module.exports = {
     async create(request, response) {
         console.log(request.body);
@@ -34,10 +35,46 @@ module.exports = {
         }
     },
 
-    async getAll(request, response) {
-        const {donatorId} = request.body;
+    async index(request, response) {
+        const {patientId} = request.params;
 
-        // Remember what is the purpose of this query?
-    }
+        const patient = await db.Patient.findOne({
+            where: {
+                patientId: patientId
+            },
+        });
+
+        if(patient) {
+            return response.status(200).json({
+                success: true,
+                patient: patient
+            });
+        }
+        return response.status(404).json({
+            success: false,
+            message: 'Patient not found'
+        });
+        
+    },
+
+    async getAll(request, response) {
+        const patients = await db.Patient.findAll({
+            include: [{
+                model: db.User,
+                as: 'user',
+                attributes: ['name', 'birthDate', 'phone', 'bloodType', 'sex', 'email'],
+        }]});
+        if(patients) {
+            return response.status(200).json({
+                success: true,
+                patients: patients
+            });
+        }
+        return response.status(404).json({
+            success: false,
+            message: 'Patients not found'
+        });
+    },
+
 
 };

@@ -14,17 +14,23 @@ module.exports = (sequelize, DataTypes) => {
       DonationToPatient.belongsTo(models.Donation, {
         foreignKey: 'donationId',
         onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
+        onUpdate: 'CASCADE',
+        as: 'donation'
       });
       DonationToPatient.hasOne(models.Patient, {
         foreignKey: 'patientId',
         onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
+        onUpdate: 'CASCADE',
+        as: 'patient'
       });
     }
   };
   DonationToPatient.init({
-    patientId: DataTypes.UUID
+    patientId: DataTypes.UUID,
+    donationId: {
+      type:DataTypes.UUID,
+      primaryKey: true
+    }
   }, {
     sequelize,
     modelName: 'DonationToPatient',

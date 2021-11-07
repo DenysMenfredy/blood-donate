@@ -2,6 +2,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const db  = require('../../models');
+const { getAll } = require('./PatientController');
 
 const SECRET_KEY = 'strongUniqueAndRandom';
 
@@ -133,6 +134,21 @@ module.exports = {
 
         return response.status(404).send('Donator not found');
 
+    },
+
+    async getAll(request, response) {
+        const donators = await db.Donator.findAll({
+            include: [{
+                model: db.User,
+                as: 'user',
+                attributes: ['name', 'birthDate', 'bloodType', 'sex', 'phone', 'email']
+        }]});
+        
+        if (donators) {
+            return response.status(200).json(donators);
+        }
+
+        return response.status(404).send('Donators not found');
     }
 
     // async getDonationsToPatients(request, response) {

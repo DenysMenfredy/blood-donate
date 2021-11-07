@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'donatorId',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
+        as: 'donator'
       });
     }
   };
@@ -25,6 +26,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     donationDate: DataTypes.DATE,
     donatorId: DataTypes.UUID,
+    status: {
+      type:DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'Pending'
+    }
   }, {
     sequelize,
     modelName: 'Donation',

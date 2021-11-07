@@ -19,6 +19,11 @@ module.exports = {
           key: 'donatorId'
         }
       },
+      status: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: 'PENDING'
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

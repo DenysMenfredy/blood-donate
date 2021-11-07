@@ -1,43 +1,46 @@
-const db = require('../db/connection');
+const db = require('../../models');
 
 module.exports = {
     async create(request, response) {
-        const {nome, endereco, cidade, uf, telefone} = request.body;
-        const query = 'INSERT INTO banco_sangue (nome, endereco, cidade, uf, telefone) VALUES ($1, $2, $3, $4, $5)';
-        const params = [nome, endereco, cidade, uf, telefone];
+        const {name, address, city, state, phone} = request.body;
         
-        await db.query(query, params, (err, res) => {
-            if(err) {
-                console.log(err);
-                response.status(400).send("Erro ao adicionar banco de sangue");
-                db.end();
-            }
-            response.status(200).send("Banco de sangue adicionado com sucesso");
+        const bloodBank = await db.BloodBank.create({
+            name,
+            address,
+            city,
+            state,
+            phone
         });
+
+        if (!bloodBank) {
+            return response.status(400).json({error: 'Blood bank not created'});
+        }
+        return response.status(201).json(bloodBank);
     },
 
     async getId(request, response) {
-        const {nome} = request.body;
-        const query = 'SELECT * FROM banco_sangue WHERE nome=$1';
+        const {name} = request.params;
+        
 
-        // console.log(query);
-        await db.query(query, [nome], (err, results) => {
-            if(err) {
-                response.status(400).send(err);
-                //db.end();
-            }
-            console.log(results.rows[0].id_banco);
-            response.send({"id_banco": results.rows[0].id_banco});
+        const bloodBank = await db.BloodBank.findOne({
+            where: {
+                name: name
+            },
+            attributes: ['id']
         });
+
+        if (!bloodBank) {
+            return response.status(400).json({error: 'Blood bank not found'});
+        }
+        return response.status(200).json(bloodBank);
 
     },
     async getAll(request, response) {
-        const query = 'SELECT * FROM banco_sangue';
-        await db.query(query, [], (err, result) => {
-            if(err) {
-                return response.status(400).send(err);
-            }
-            return response.status(200).send(result.rows);
-        });
+        const bloodBanks = await db.BloodBank.findAll();
+
+        if (!bloodBanks) {
+            return response.status(400).json({error: 'Blood banks not found'});
+        }
+        return response.status(200).json(bloodBanks);
     }
 };

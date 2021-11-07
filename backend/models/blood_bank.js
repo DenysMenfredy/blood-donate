@@ -21,8 +21,8 @@ module.exports = (sequelize, DataTypes) => {
         city: DataTypes.STRING,
         state: DataTypes.STRING,
         phone: DataTypes.STRING,
-        createdAat: DataTypes.DATE,
-        updatedAat: DataTypes.DATE,
+        createdAt: DataTypes.DATE,
+        updatedAt: DataTypes.DATE,
     }, {
         sequelize,
         modelName: 'BloodBank',

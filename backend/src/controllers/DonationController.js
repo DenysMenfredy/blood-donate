@@ -1,38 +1,97 @@
-const db = require('../db/connection');
+const db = require('../../models');
 
 
 module.exports = {
 
     async donateToBank(request, response) {
-        const {donatorId, bankId, data} = request.body;
-        console.log(data);
-        const query = 'CALL doacao_banco($1, $2, $3)'
+        const {donatorId, bankId, date} = request.body;
         
-        await db.query(query, [donatorId, bankId, data], (err, results) => {
-            if(err) {
-                if (err.code === '22012') {
-                    console.log('erro na diferença de datas...');
-                    return response.status(502).send("ERRO ao adicionar doação");
-                }
-                // db.end();
-            }
-            console.log(results);
-            return response.status(200).send("Doação realizada");
-            // db.end();
+        const donation = await db.Donation.create({
+            donatorId,
+            donationDate: date,
         });
+
+        if(!donation) {
+            return response.status(400).json({
+                message: 'Donation not created'
+            });
+        }
+        const donationToBank = await db.DonationToBank.create({
+            donationId: donation.donationId,
+            bankId,
+        });
+
+        if(!donationToBank) {
+            return response.status(400).json({
+                message: 'Donation to Bank not created'
+            });
+        }
+
+        return response.status(201).json({status:"sucess",
+                                          message:"Donation to bank scheduled with sucess",
+                                          donation: donationToBank});
+        
+    },
+
+    async donationsToBanks(request, response) {
+        const donations = await db.DonationToBank.findAll({
+            include: [{
+                model: db.Donation,
+                as: 'donation',
+                attributes: ['donationId', 'donationDate', 'status'],
+            }]
+        });
+        if(!donations) {
+            return response.status(400).json({
+                message: 'Donations not found'
+            });
+        }
+        return response.status(200).json({status:"sucess",
+                                          message:"Donations retrieved with sucess",
+                                          donations});
     },
 
     async donateToPatient(request, response) {
-        const {donatorId, patientId, data} = request.body;
+        const {donatorId, patientId, date} = request.body;
         // console.log(donatorId, patientId, data);
-        const query = 'INSERT INTO doacao_paciente (id_doador, id_paciente, data_doacao) VALUES ($1, $2, $3)';
 
-        await db.query(query, [donatorId, patientId, data], (err, results) => {
-            if(err) {
-                // console.log(err);
-                return response.status(502).send("Erro ao adicionar doação");
-            }
-                return response.status(200).send("Doação realizada");
-         });
+        const donation = await db.Donation.create({
+            donatorId,
+            donationDate: date,
+        });
+        if(!donation) {
+            return response.status(400).json({message: 'Donation not created'});
+        }
+        const donationToPatient = await db.DonationToPatient.create({
+            donationId: donation.donationId,
+            patientId,
+        });
+        if(!donationToPatient) {
+            return response.status(500).json({status: "error",
+                                            message:"ERRO when adding donation to patient"});
+        }
+        // console.log(donationToPatient);
+        return response.status(201).json({status:"sucess",
+                                          message:"Donation to patient scheduled with sucess",
+                                          donation: donationToPatient});
+    },
+
+    async donationsToPatients(request, response) {
+        const donations = await db.DonationToPatient.findAll({
+            include: [{
+                model: db.Donation,
+                as: 'donation',
+                attributes: ['donationId', 'donationDate', 'donatorId', 'status'],
+            }]
+        });
+        if(!donations) {
+            return response.status(500).json({status: "error",
+                                            message:"ERRO when getting donations"});
+        }
+        return response.status(200).json({status:"sucess",
+                                          message:"Donations retrieved with sucess",
+                                          donations});
+                            
+
     }
 }

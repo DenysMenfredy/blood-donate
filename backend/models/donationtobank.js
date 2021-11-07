@@ -14,11 +14,13 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'donationId',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
+        as: 'donation'
       });
       DonationToBank.hasOne(models.BloodBank, {
         foreignKey: 'id',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
+        as: 'bloodBank'
       });
     }
   };
