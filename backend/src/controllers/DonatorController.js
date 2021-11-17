@@ -2,7 +2,8 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const db  = require('../../models');
-const { getAll } = require('./PatientController');
+
+
 
 const SECRET_KEY = 'strongUniqueAndRandom';
 
@@ -23,7 +24,7 @@ module.exports = {
             phone: telefone
         });
         if(user) {
-            console.log(user);
+            // console.log(user);
             const donator = await db.Donator.create({
                 userId: user.userId,
                 username: username,
@@ -55,16 +56,16 @@ module.exports = {
         });
         if(donator) {
             const token = jwt.sign({
-                donatorId: donator.userId,
+                donatorId: donator.donatorId,
                 username: donator.username,
                 password: donator.password
             }, SECRET_KEY, {
-                expiresIn: '2m'
+                expiresIn: '1h'
             });
             return res.status(200).json({
                 message: 'Logged in',
                 token: token,
-                expiresIn: 120
+                expiresIn: 3600
             });
         } else {
             return res.status(401).json({
@@ -96,16 +97,23 @@ module.exports = {
     async index(req, res) {
         // console.log(req.params);
         const {donatorId} = req.params;
-        console.log(donatorId);
+        // console.log(donatorId);
 
         const donator = await db.Donator.findOne({
+            include: [{
+                model: db.User,
+                as: 'user',
+                attributes: ['name', 'birthDate', 'bloodType'],
+                required: false
+            }],
             where: {
-                donatorId: donatorId
-            }
+                donatorId: donatorId,
+            },
+            attributes: ['donatorId', 'username', 'password']
         });
 
         if (donator) {
-            console.log(donator);
+            // console.log(donator);
             return res.status(200).json(donator);
         }
 
@@ -149,7 +157,7 @@ module.exports = {
         }
 
         return response.status(404).send('Donators not found');
-    }
+    },
 
     // async getDonationsToPatients(request, response) {
     //     const {id} = request.body;
@@ -183,17 +191,30 @@ module.exports = {
         
     // },
 
-    // async numDonations(request, response) {
-    //     const {donatorId} = request.body;
-    //     const query = 'SELECT * FROM num_donations($1);';
-        
-    //     await db.query(query, [donatorId], (err, results) => {
-    //         if (err) {
-    //             return response.status(400).send(err);
-    //         }
-    //         return response.status(200).send({"num_donations":results.rows[0].num_donations});
-	//     //console.log(results.rows[0]);
-    //     });
-    // }
+    async numDonations(request, response) {
+        //TODO: Finish this query and understand how sequelize do joins
+        const {donatorId} = request.body;
+        const query = 'SELECT COUNT(*) FROM donation INNER JOIN donation_to_patient ON don'
+        donations = await db.Donation.findAll({
+            include: [{
+                model: db.donationsToPatient,
+                as: 'donationsToPatient',
+                attributes: ['COUNT', db.sequelize.fn('COUNT', db.sequelize.col('donationsToPatient.donationId'))],
+            }],
+            where: {
+                donatorId: donatorId
+            }
+        });
+            
+
+        if(!donations) {
+            return response.status(404).send('Donations not found');
+        }
+        console.log(donations);
+        return response.status(200).json({
+            "sucess": true,
+            "donations": donations
+        });
+    }
 
 };

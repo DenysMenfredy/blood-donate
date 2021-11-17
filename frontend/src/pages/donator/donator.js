@@ -16,6 +16,8 @@ function Donator() {
     const [patients, setPatients] = useState([]);
     const [numDonations, setNumDonations] = useState('');
 
+    //TODO: rename all this variables to new db names
+
     function handleTokenValidation() {
         const token = sessionStorage.getItem('token');
         const config = {
@@ -26,9 +28,10 @@ function Donator() {
 
         api.post('/validate', {}, config)
         .then((response) => {
+            console.log('auth:', response.data);
             if(response.status === 200) {
                 console.log(response.data);
-                setDonatorId(response.data.id);
+                setDonatorId(response.data.donatorId);
             } else {
                 setTimeout(() => {
                     history.push('/403');   
@@ -44,26 +47,28 @@ function Donator() {
     useEffect(() => {
         handleTokenValidation();
 
-        api.get('/donator', { donatorId })
+        api.get(`/donator/${donatorId}`)
         .then(response => {
-            console.log(response);
+            console.log('info:', response.data);
             setInfo(response.data);
         });
     }, [donatorId]);
 
    useEffect( () => {
-        api.post('/patient/all', {donatorId}).then(response => {
+        api.post('/patient', {donatorId}).then(response => {
             setPatients(response.data);
-            // console.log(response.data);
+            console.log('patients:', response.data);
         });
    });
 
    useEffect( () => {
        api.post('/donator/numDonations', {donatorId}).then(response => {
-            setNumDonations(response.data.num_donations);
+            //TODO: fix-me-> backend route doesn't return numDonations
+            console.log('numDonations:', response.data);
+            setNumDonations(response.data.donations);
        });
    });
-    // console.log(userInfo);
+    console.log('user info:', userInfo);
 
 
     function handleLogout(e) {
@@ -78,7 +83,7 @@ function Donator() {
             <aside className="left-bar">
                 <div className="user-info">
                     <img src={avatar} alt="blood avatar " />
-                    <h4>{userInfo.nome}</h4>
+                    <h4>{userInfo.username}</h4>
                     <h5>Tipo sanguineo: {userInfo.tipo_sanguineo}</h5>
                     <span> {numDonations} doações realizadas</span>
                 </div>

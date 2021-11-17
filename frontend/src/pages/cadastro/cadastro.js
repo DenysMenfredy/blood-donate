@@ -12,7 +12,7 @@ function Cadastro() {
     const history = useHistory();
 
     const [nome, setNome] = useState('');
-    const [idade, setIdade] = useState('');
+    const [dataNascimento, setIdade] = useState('');
     const [sexo, setSexo] = useState('');
     const [username, setUsername] = useState('');
     const [senha, setSenha] = useState('');
@@ -24,7 +24,7 @@ function Cadastro() {
         try { 
             await api.post('/donator', {
                 nome, 
-                idade, 
+                dataNascimento, 
                 sexo, 
                 username,
                 senha,
@@ -74,9 +74,9 @@ function Cadastro() {
 
                     <div input-age>
                         <input 
-                            type="number" 
-                            placeholder="insira sua idade"
-                            value={idade}
+                            type="date" 
+                            placeholder="insira sua data de nascimento"
+                            value={dataNascimento}
                             parse={value => !value ? null : Number(value)}
                             onChange={e => setIdade(e.target.value)}
                             required

@@ -20,11 +20,12 @@ function Login() {
 
         try {
             // const response = await api.post('login', {username, password});
-            await api.post('login', {
+            await api.post('/login', {
                 username, password
             })
             .then((response) => {
                 if(response.status === 200) {
+                    console.log(response.data);
                     sessionStorage.setItem('token', response.data.token);
                     history.push('/donator');
                 } else {
