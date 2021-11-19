@@ -69,6 +69,7 @@ module.exports = {
             });
         } else {
             return res.status(401).json({
+                cod: '401',
                 message: 'Invalid credentials'
             });
         }
@@ -79,17 +80,26 @@ module.exports = {
         // console.log(req.headers);
         const bearer = req.headers.authorization;
         const [, token] = bearer.split(' ');
-        // console.log(token);
+        console.log('bearer:', bearer);
 
-        try {
-            const payload = jwt.verify(token, SECRET_KEY);
-            console.log(payload);
-            return res.status(200).json(payload);
-        } catch(err) {
-            return res.status(401).json({
-                message: 'Invalid token'
-            });
+        if(token) {
+            try {
+                const decoded = jwt.verify(token, SECRET_KEY);
+                console.log('decoded:', decoded);
+                return res.status(200).json(decoded);
+            } catch(err) {
+                return res.status(401).json({
+                    cod: '401',
+                    message: 'Invalid token'
+                });
+            }
         }
+
+        return res.status(401).json({
+            cod: '401',
+            message: 'Invalid token'
+        });
+
 
     },
 

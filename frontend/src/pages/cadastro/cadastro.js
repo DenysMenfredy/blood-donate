@@ -32,7 +32,8 @@ function Cadastro() {
                 tipo_sanguineo
             }).then( (response) => {
                 if (response.status === 200) {
-                    api.post('/login', {username, password:senha}).then( (response) => {
+                    api.post('/login', {username, password:senha})
+                    .then( (response) => {
                         if (response.status === 200) {
                             // const response = await api.post('/donator/getId', {username});
                             localStorage.setItem('donatorId', response.data.userInfo.id);

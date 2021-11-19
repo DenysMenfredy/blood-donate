@@ -24,16 +24,15 @@ function Login() {
                 username, password
             })
             .then((response) => {
+                console.log(response);
                 if(response.status === 200) {
-                    console.log(response.data);
                     sessionStorage.setItem('token', response.data.token);
                     history.push('/donator');
-                } else {
-                    sessionStorage.removeItem('token');
-                    alert('Falha ao fazer login');
                 }
             }).catch((error) => {
                 sessionStorage.removeItem('token');
+                console.log(error);
+                alert('username or password incorrect.');
             });
             // console.log(response);
             //localStorage.setItem('donatorId', response.data.userInfo.id);

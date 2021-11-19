@@ -15,6 +15,7 @@ function Donator() {
     const [donatorId, setDonatorId] = useState(null);
     const [patients, setPatients] = useState([]);
     const [numDonations, setNumDonations] = useState('');
+    const [authorized, setAuthorized] = useState(false);
 
     //TODO: rename all this variables to new db names
 
@@ -32,16 +33,19 @@ function Donator() {
             if(response.status === 200) {
                 console.log(response.data);
                 setDonatorId(response.data.donatorId);
-            } else {
-                setTimeout(() => {
-                    history.push('/403');   
-                }, 5000);
-                history.push('/')
-            }  
+                setAuthorized(true);
+            } 
+                  
         })
         .catch((error) => {
-            console.log(error);
-        })
+            console.log('err:', error);
+            // setTimeout(() => {
+            //     history.push('/403');   
+            // }, 3000);
+            // history.push('/');
+            history.push('/403');
+            setAuthorized(false);
+        });
     }
 
     useEffect(() => {
