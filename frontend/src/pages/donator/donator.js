@@ -15,6 +15,9 @@ function Donator() {
     const [donatorId, setDonatorId] = useState(null);
     const [patients, setPatients] = useState([]);
     const [numDonations, setNumDonations] = useState('');
+    const [authorized, setAuthorized] = useState(false);
+
+    //TODO: rename all this variables to new db names
 
     function handleTokenValidation() {
         const token = sessionStorage.getItem('token');
@@ -23,47 +26,53 @@ function Donator() {
                 'Authorization': `Bearer ${token}`
             }
         };
-
         api.post('/validate', {}, config)
-        .then((response) => {
-            if(response.status === 200) {
-                console.log(response.data);
-                setDonatorId(response.data.id);
-            } else {
+            .then((response) => {
+                console.log('auth:', response.data);
+                if(response.status === 200) {
+                    console.log(response.data);
+                    setDonatorId(response.data.donatorId);
+                    setAuthorized(true);
+                } 
+            })
+            .catch((error) => {
+                console.log('err:', error);
+                history.push('/403');   
+                setAuthorized(false);
                 setTimeout(() => {
-                    history.push('/403');   
-                }, 5000);
-                history.push('/')
-            }  
-        })
-        .catch((error) => {
-            console.log(error);
-        })
+                    history.push('/');
+                }, 3000);
+            });
     }
 
     useEffect(() => {
         handleTokenValidation();
 
-        api.get('/donator', { donatorId })
+        api.get(`/donator/${donatorId}`)
         .then(response => {
-            console.log(response);
+            console.log('info:', response.data);
             setInfo(response.data);
         });
     }, [donatorId]);
 
    useEffect( () => {
-        api.post('/patient/all', {donatorId}).then(response => {
+        api.get('/patient', {}).then(response => {
             setPatients(response.data);
-            // console.log(response.data);
+            console.log('patients:', response.data);
         });
    });
 
    useEffect( () => {
-       api.post('/donator/numDonations', {donatorId}).then(response => {
-            setNumDonations(response.data.num_donations);
+       api.post('/donator/numDonations', {donatorId})
+       .then(response => {
+            //TODO: fix-me-> backend route doesn't return numDonations
+            console.log('numDonations:', response.data);
+            setNumDonations(response.data.numDonations);
+       }).catch(error => {
+           throw new Error(error);
        });
    });
-    // console.log(userInfo);
+    console.log('user info:', userInfo);
 
 
     function handleLogout(e) {
@@ -78,7 +87,7 @@ function Donator() {
             <aside className="left-bar">
                 <div className="user-info">
                     <img src={avatar} alt="blood avatar " />
-                    <h4>{userInfo.nome}</h4>
+                    <h4>{userInfo.username}</h4>
                     <h5>Tipo sanguineo: {userInfo.tipo_sanguineo}</h5>
                     <span> {numDonations} doações realizadas</span>
                 </div>

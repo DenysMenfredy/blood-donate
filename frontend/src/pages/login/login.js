@@ -20,19 +20,19 @@ function Login() {
 
         try {
             // const response = await api.post('login', {username, password});
-            await api.post('login', {
+            await api.post('/login', {
                 username, password
             })
             .then((response) => {
+                console.log(response);
                 if(response.status === 200) {
                     sessionStorage.setItem('token', response.data.token);
                     history.push('/donator');
-                } else {
-                    sessionStorage.removeItem('token');
-                    alert('Falha ao fazer login');
                 }
             }).catch((error) => {
                 sessionStorage.removeItem('token');
+                console.log(error);
+                alert('username or password incorrect.');
             });
             // console.log(response);
             //localStorage.setItem('donatorId', response.data.userInfo.id);

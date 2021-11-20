@@ -65,13 +65,9 @@ module.exports = {
                 attributes: ['name', 'birthDate', 'phone', 'bloodType', 'sex', 'email'],
         }]});
         if(patients) {
-            return response.status(200).json({
-                success: true,
-                patients: patients
-            });
+            return response.status(200).send(patients);
         }
         return response.status(404).json({
-            success: false,
             message: 'Patients not found'
         });
     },

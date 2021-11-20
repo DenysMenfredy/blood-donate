@@ -18,7 +18,7 @@ routes.post('/donator', DonatorController.create);
 routes.get('/donator/:donatorId', DonatorController.index);
 routes.post('/donator/getId', DonatorController.getId);
 routes.get('/donator', DonatorController.getAll);
-// routes.post('/donator/numDonations', DonatorController.numDonations);
+routes.post('/donator/numDonations', DonatorController.numDonations);
 // routes.post('/donations/patients', DonatorController.getDonationsToPatients);
 // routes.post('/donations/banks', DonatorController.getDonationsToBanks);
 

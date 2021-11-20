@@ -2,7 +2,9 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const db  = require('../../models');
-const { getAll } = require('./PatientController');
+const donator = require('../../models/donator');
+
+
 
 const SECRET_KEY = 'strongUniqueAndRandom';
 
@@ -23,15 +25,15 @@ module.exports = {
             phone: telefone
         });
         if(user) {
-            console.log(user);
+            // console.log(user);
             const donator = await db.Donator.create({
                 userId: user.userId,
                 username: username,
                 password: password
             });
-            console.log('Donator:', donator);
+            // console.log('Donator:', donator);
             if(donator) {
-                console.log('Donator created');
+                // console.log('Donator created');
                 return response.status(201).json(donator);
             }
         } else {
@@ -55,19 +57,20 @@ module.exports = {
         });
         if(donator) {
             const token = jwt.sign({
-                donatorId: donator.userId,
+                donatorId: donator.donatorId,
                 username: donator.username,
                 password: donator.password
             }, SECRET_KEY, {
-                expiresIn: '2m'
+                expiresIn: '1h'
             });
             return res.status(200).json({
                 message: 'Logged in',
                 token: token,
-                expiresIn: 120
+                expiresIn: 3600
             });
         } else {
             return res.status(401).json({
+                cod: '401',
                 message: 'Invalid credentials'
             });
         }
@@ -78,17 +81,26 @@ module.exports = {
         // console.log(req.headers);
         const bearer = req.headers.authorization;
         const [, token] = bearer.split(' ');
-        // console.log(token);
+        console.log('bearer:', bearer);
 
-        try {
-            const payload = jwt.verify(token, SECRET_KEY);
-            console.log(payload);
-            return res.status(200).json(payload);
-        } catch(err) {
-            return res.status(401).json({
-                message: 'Invalid token'
-            });
+        if(token) {
+            try {
+                const decoded = jwt.verify(token, SECRET_KEY);
+                console.log('decoded:', decoded);
+                return res.status(200).json(decoded);
+            } catch(err) {
+                return res.status(401).json({
+                    cod: '401',
+                    message: 'Invalid token'
+                });
+            }
         }
+
+        return res.status(401).json({
+            cod: '401',
+            message: 'Invalid token'
+        });
+
 
     },
 
@@ -96,29 +108,31 @@ module.exports = {
     async index(req, res) {
         // console.log(req.params);
         const {donatorId} = req.params;
-        console.log(donatorId);
-
+        // console.log(donatorId);
         const donator = await db.Donator.findOne({
+            include: [{
+                model: db.User,
+                as: 'user',
+                attributes: ['name', 'birthDate', 'bloodType', 'sex'],
+                // required: true,
+            }],
             where: {
-                donatorId: donatorId
-            }
+                donatorId: donatorId,
+            },
+            attributes: ['donatorId', 'username', 'password']
         });
+    
+            if (donator) {
+                // console.log(donator);
+                return res.status(200).send(donator);
+            }
+    
+            return res.status(404).send('Donator not found');
 
-        if (donator) {
-            console.log(donator);
-            return res.status(200).json(donator);
-        }
-
-        return res.status(404).send('Donator not found');
-
-        // if (!response) {
-        //     return res.status(400).json({error: "User not found"});
-        // }
-        // return res.json(response.rows[0]);
     },
 
     async getId(request, response) {
-        console.log(request.body);
+        // console.log(request.body);
         const {username} = request.body;
 
         const donatorId = await db.Donator.findOne({
@@ -149,7 +163,7 @@ module.exports = {
         }
 
         return response.status(404).send('Donators not found');
-    }
+    },
 
     // async getDonationsToPatients(request, response) {
     //     const {id} = request.body;
@@ -183,17 +197,27 @@ module.exports = {
         
     // },
 
-    // async numDonations(request, response) {
-    //     const {donatorId} = request.body;
-    //     const query = 'SELECT * FROM num_donations($1);';
-        
-    //     await db.query(query, [donatorId], (err, results) => {
-    //         if (err) {
-    //             return response.status(400).send(err);
-    //         }
-    //         return response.status(200).send({"num_donations":results.rows[0].num_donations});
-	//     //console.log(results.rows[0]);
-    //     });
-    // }
+    async numDonations(request, response) {
+        //TODO: Finish this query and understand how sequelize do joins
+        const {donatorId} = request.body;
+        const query = `SELECT COUNT(*) FROM donation INNER JOIN donator ON 
+                       donation.donatorId=donator.donatorId
+                       WHERE donator.donatorId=${donatorId}`
+
+        const donations = await db.Donation.findAll({
+            attributes: [[db.sequelize.fn('COUNT', db.sequelize.col('donationId')), 'numDonations']],
+            where: {
+                donatorId: donatorId
+            },
+        });
+
+        if (donations) {
+            // console.log(donations);
+            return response.status(200).json(donations);
+        }
+        return response.status(404).send('Donations not found');
+            
+
+    }
 
 };
