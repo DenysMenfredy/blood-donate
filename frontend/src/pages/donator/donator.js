@@ -11,7 +11,6 @@ import {BiDonateBlood} from 'react-icons/bi';
 function Donator() {
     const history = useHistory();
     const [userInfo, setInfo] = useState({});
-    const username = localStorage.getItem('username');
     const [donatorId, setDonatorId] = useState(null);
     const [patients, setPatients] = useState([]);
     const [numDonations, setNumDonations] = useState('');
@@ -41,21 +40,26 @@ function Donator() {
                 setAuthorized(false);
                 setTimeout(() => {
                     history.push('/');
-                }, 3000);
+                }, 5000);
             });
     }
 
     useEffect(() => {
         handleTokenValidation();
-
+        if(!authorized) {
+            return;
+        }
         api.get(`/donator/${donatorId}`)
         .then(response => {
             console.log('info:', response.data);
             setInfo(response.data);
         });
-    }, [donatorId]);
+    }, [donatorId, authorized]);
 
    useEffect( () => {
+       if (!authorized) {
+           return
+       }
         api.get('/patient', {}).then(response => {
             setPatients(response.data);
             console.log('patients:', response.data);
@@ -63,9 +67,11 @@ function Donator() {
    });
 
    useEffect( () => {
+         if (!authorized) {
+             return
+         }
        api.post('/donator/numDonations', {donatorId})
        .then(response => {
-            //TODO: fix-me-> backend route doesn't return numDonations
             console.log('numDonations:', response.data);
             setNumDonations(response.data.numDonations);
        }).catch(error => {
@@ -80,6 +86,7 @@ function Donator() {
         localStorage.clear();
         sessionStorage.clear();
         history.push('/');
+        setAuthorized(false);
     }
 
     return (
@@ -121,9 +128,10 @@ function Donator() {
                 </div>
                 <div className="donate-to-patient">
                     <h1>Pacientes disponivéis para doação</h1>
-                    <div className="search-results">
-                        <PersonToDonate persons={patients}/>
-                    </div>
+                    {patients.map( (patient) => (
+                            <PersonToDonate key={patient.patientId} patient={patient} />
+                        )
+                    )}
                 </div>
 
                 

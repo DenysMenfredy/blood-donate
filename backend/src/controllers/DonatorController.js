@@ -2,7 +2,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const db  = require('../../models');
-const donator = require('../../models/donator');
 
 
 
@@ -106,6 +105,7 @@ module.exports = {
 
 
     async index(req, res) {
+        // TODO: fix association to return user information
         // console.log(req.params);
         const {donatorId} = req.params;
         // console.log(donatorId);
@@ -198,13 +198,9 @@ module.exports = {
     // },
 
     async numDonations(request, response) {
-        //TODO: Finish this query and understand how sequelize do joins
         const {donatorId} = request.body;
-        const query = `SELECT COUNT(*) FROM donation INNER JOIN donator ON 
-                       donation.donatorId=donator.donatorId
-                       WHERE donator.donatorId=${donatorId}`
 
-        const donations = await db.Donation.findAll({
+        const [donations] = await db.Donation.findAll({
             attributes: [[db.sequelize.fn('COUNT', db.sequelize.col('donationId')), 'numDonations']],
             where: {
                 donatorId: donatorId

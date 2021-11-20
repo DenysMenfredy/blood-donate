@@ -33,9 +33,9 @@ module.exports = (sequelize, DataTypes) => {
         sequelize,
         modelName: 'Donator',
         tableName: 'donator',
-        defaultScope: {
-            include: 'user'
-        }
+        // defaultScope: {
+        //     include: 'user'
+        // },
     });
     // Donator.sync({
     //     force: false,

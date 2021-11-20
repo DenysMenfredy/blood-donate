@@ -64,6 +64,7 @@ module.exports = {
                 as: 'user',
                 attributes: ['name', 'birthDate', 'phone', 'bloodType', 'sex', 'email'],
         }]});
+        
         if(patients) {
             return response.status(200).send(patients);
         }

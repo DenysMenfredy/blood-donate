@@ -15,7 +15,7 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
     min: 0,
     acquire: 30000,
     idle: 10000
-  }
+  },
 });
 
 
