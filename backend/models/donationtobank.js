@@ -35,6 +35,9 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'DonationToBank',
     tableName: 'donation_to_bank',
+    defaultScope: {
+      include: ['donation', 'bloodBank']
+    }
   });
   return DonationToBank;
 };

@@ -26,26 +26,23 @@ function Donator() {
                 'Authorization': `Bearer ${token}`
             }
         };
-
         api.post('/validate', {}, config)
-        .then((response) => {
-            console.log('auth:', response.data);
-            if(response.status === 200) {
-                console.log(response.data);
-                setDonatorId(response.data.donatorId);
-                setAuthorized(true);
-            } 
-                  
-        })
-        .catch((error) => {
-            console.log('err:', error);
-            // setTimeout(() => {
-            //     history.push('/403');   
-            // }, 3000);
-            // history.push('/');
-            history.push('/403');
-            setAuthorized(false);
-        });
+            .then((response) => {
+                console.log('auth:', response.data);
+                if(response.status === 200) {
+                    console.log(response.data);
+                    setDonatorId(response.data.donatorId);
+                    setAuthorized(true);
+                } 
+            })
+            .catch((error) => {
+                console.log('err:', error);
+                history.push('/403');   
+                setAuthorized(false);
+                setTimeout(() => {
+                    history.push('/');
+                }, 3000);
+            });
     }
 
     useEffect(() => {
@@ -59,17 +56,20 @@ function Donator() {
     }, [donatorId]);
 
    useEffect( () => {
-        api.post('/patient', {donatorId}).then(response => {
+        api.get('/patient', {}).then(response => {
             setPatients(response.data);
             console.log('patients:', response.data);
         });
    });
 
    useEffect( () => {
-       api.post('/donator/numDonations', {donatorId}).then(response => {
+       api.post('/donator/numDonations', {donatorId})
+       .then(response => {
             //TODO: fix-me-> backend route doesn't return numDonations
             console.log('numDonations:', response.data);
-            setNumDonations(response.data.donations);
+            setNumDonations(response.data.numDonations);
+       }).catch(error => {
+           throw new Error(error);
        });
    });
     console.log('user info:', userInfo);

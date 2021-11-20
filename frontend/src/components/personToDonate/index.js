@@ -14,10 +14,10 @@ function PersonToDonate(props) {
         const idDoador = localStorage.getItem('donatorId');
         // localStorage.setItem('PatientId', patient_id);
         // const id_patient = localStorage.getItem('PatientId');
-        const response = await api.post('/doacao/paciente', {
+        const response = await api.post('/donation/patient', {
             donatorId:idDoador, 
             patientId:patientId,
-            data:data 
+            date:data 
         });
         alert(response.data);
 
@@ -27,12 +27,12 @@ function PersonToDonate(props) {
 
     return props.persons.map( function (person) {
         return (
-            <div key={person.id} className="person-box">
+            <div key={person.patientId} className="person-box">
                 <div className="person-info">
                     <div className="left-info">
-                        <h4>Nome: {person.nome}</h4>
-                        <h4>Idade: {person.idade} anos</h4>
-                        <h4>Motivo doação: {person.motivo}</h4>
+                        <h4>Name: {person.user.name}</h4>
+                        <h4>Birth Date: {person.user.birthDate}</h4>
+                        <h4>Reason: {person.reason}</h4>
                         <input 
                             type="date"
                             id="data"
@@ -41,12 +41,12 @@ function PersonToDonate(props) {
                             />
                     </div>
                     <div className="right-info">
-                        <h4>Tipo sanguineo: {person.tipo_sanguineo}</h4>
-                        <h4>Sexo: {person.sexo}</h4>
+                        <h4>Blood type: {person.user.bloodType}</h4>
+                        <h4>Sex: {person.user.sex}</h4>
                     </div>
                 </div>
                 <div className="donate-btn">
-                    <button onClick={(e) => makeDonation(e, person.id, data)}>Doar</button>
+                    <button onClick={(e) => makeDonation(e, person.id, data)}>Donate</button>
                 </div>
             </div>
 
