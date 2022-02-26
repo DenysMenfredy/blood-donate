@@ -44,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'Donation',
     tableName: 'donation',
   });
-  Donation.sync({force: true, alter: true}).then(() => {
+  Donation.sync({force: false, alter: false}).then(() => {
     console.log('Table and model (donation) synced successfully');
   }).catch((err) => {
     console.log("Error syncing model and table Donation", err);

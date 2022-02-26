@@ -14,10 +14,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'donationId',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
+        as: 'donation',
         constraints: false
       });
       DonationToBank.hasOne(models.BloodBank, {
-        foreignKey: 'id',
+        foreignKey: 'blood_bank_id',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
         as: 'bloodBank'
@@ -39,11 +40,11 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'DonationToBank',
     tableName: 'donation_to_bank',
-    defaultScope: {
-      include: ['donation', 'bloodBank']
-    }
+    // defaultScope: {
+    //   include: ['donation', 'bloodBank']
+    // }
   });
-  DonationToBank.sync({force: true, alter: true}).then(() => {
+  DonationToBank.sync({force: false, alter: true}).then(() => {
     console.log('Table and model synced successfully');
   }).catch((err) => {
     console.log("Error syncing model and table Donation to Bank", err);

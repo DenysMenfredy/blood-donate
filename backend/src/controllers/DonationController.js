@@ -6,30 +6,49 @@ module.exports = {
     async donateToBank(request, response) {
         const {donatorId, bankId, date} = request.body;
         
-        const donation = await db.Donation.create({
-            donatorId,
-            donationDate: date,
+        const donator = await db.Donator.findOne({
+            where:{
+                donatorId: donatorId
+            }
+        })
+
+        if(!donator) {
+            return response.status(400).json({error: 'Donator not found'});
+        }
+
+        const bloodBank = await db.BloodBank.findOne({
+            where:{
+                blood_bank_id: bankId
+            }
         });
 
-        if(!donation) {
+        if(!bloodBank) {
+            return response.status(400).json({error: 'Blood bank not found'});
+        }
+
+        const donation = db.Donation.create({
+            donatorId,
+            donationDate: date,
+        }).then((donation) => {
+            const donationToBank = db.DonationToBank.create({
+                donationId: donation.donationId,
+                bankId,
+            }).then((donationToBank) => {
+                return response.status(201).json({
+                    status: 'success',
+                    message: 'Donation created successfully',
+                    donationToBank: donationToBank
+                });
+            }).catch((err) => {
+                console.log(err);
+                return response.status(500).json({error: "Error creating donation to bank"});
+            })
+        }).catch((err) => {
             return response.status(400).json({
                 message: 'Donation not created'
             });
-        }
-        const donationToBank = await db.DonationToBank.create({
-            donationId: donation.donationId,
-            bankId,
         });
 
-        if(!donationToBank) {
-            return response.status(400).json({
-                message: 'Donation to Bank not created'
-            });
-        }
-
-        return response.status(201).json({status:"sucess",
-                                          message:"Donation to bank scheduled with sucess",
-                                          donation: donationToBank});
         
     },
 
@@ -54,26 +73,50 @@ module.exports = {
     async donateToPatient(request, response) {
         const {donatorId, patientId, date} = request.body;
         // console.log(donatorId, patientId, data);
+        
+        const donator = await db.Donator.findOne({
+            where:{
+                donatorId: donatorId
+            }
+        })
 
-        const donation = await db.Donation.create({
+        if(!donator) {
+            return response.status(400).json({error: 'Donator not found'});
+        }
+
+        const patient = await db.Patient.findOne({
+            where:{
+                patientId: patientId
+            }
+        });
+
+        if(!patient) {
+            return response.status(400).json({error: 'Patient not found'});
+        }
+
+        const donation = db.Donation.create({
             donatorId,
             donationDate: date,
-        });
-        if(!donation) {
-            return response.status(400).json({message: 'Donation not created'});
-        }
-        const donationToPatient = await db.DonationToPatient.create({
-            donationId: donation.donationId,
-            patientId,
-        });
-        if(!donationToPatient) {
-            return response.status(500).json({status: "error",
-                                            message:"ERRO when adding donation to patient"});
-        }
-        // console.log(donationToPatient);
-        return response.status(201).json({status:"sucess",
-                                          message:"Donation to patient scheduled with sucess",
-                                          donation: donationToPatient});
+        }).then((donation) => {
+            const donationToPatient = db.DonationToPatient.create({
+                donationId: donation.donationId,
+                patientId,
+            }).then((donationToPatient) => {
+                return response.status(201).json({
+                    status: 'success',
+                    message: 'Donation created successfully',
+                    donationToPatient: donationToPatient
+                });
+            }).catch((err) => {
+                console.log(err);
+                return response.status(500).json({error: "Error creating donation to patient"});
+            })
+        }).catch((err) => {
+            return response.status(400).json({
+                message: 'Donation not created'
+            });
+        })
+        
     },
 
     async donationsToPatients(request, response) {
@@ -86,11 +129,9 @@ module.exports = {
         });
         if(!donations) {
             return response.status(500).json({status: "error",
-                                            message:"ERRO when getting donations"});
+                                              message:"ERRO when getting donations"});
         }
-        return response.status(200).json({status:"sucess",
-                                          message:"Donations retrieved with sucess",
-                                          donations});
+        return response.status(200).json({donations});
                             
 
     }

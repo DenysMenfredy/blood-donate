@@ -14,7 +14,8 @@ module.exports = (sequelize, DataTypes) => {
         blood_bank_id: {
             type: DataTypes.UUID,
             primaryKey: true,
-            defaultValue: DataTypes.UUIDV4
+            allowNull: false,
+            defaultValue: DataTypes.UUIDV4,
         },
         name: {
             type:DataTypes.STRING, 
@@ -41,7 +42,8 @@ module.exports = (sequelize, DataTypes) => {
         modelName: 'BloodBank',
         tableName: 'blood_bank',
     });
-    BloodBank.sync({force: true, alter: true}).then(() => {
+    // BloodBank.removeAttribute('id');
+    BloodBank.sync({force: false, alter: false}).then(() => {
         console.log('Table and model synced successfully');
       }).catch((err) => {
         console.log("Error syncing model and table Blood Bank", err);

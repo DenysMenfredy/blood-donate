@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'donationId',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
+        as: 'donation',
         constraints: false,
       });
       DonationToPatient.hasOne(models.Patient, {
@@ -43,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
       include: ['donation', 'patient']
     }
   });
-  DonationToPatient.sync({force: true, alter: true}).then(() => {
+  DonationToPatient.sync({force: false, alter: false}).then(() => {
     console.log('Table and model synced successfully');
   }).catch((err) => {
     console.log("Error syncing model and table Donation to Patient", err);
