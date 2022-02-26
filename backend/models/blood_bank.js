@@ -11,26 +11,40 @@ module.exports = (sequelize, DataTypes) => {
         }
     };
     BloodBank.init({
-        id: {
+        blood_bank_id: {
             type: DataTypes.UUID,
             primaryKey: true,
             defaultValue: DataTypes.UUIDV4
         },
-        name: DataTypes.STRING,
-        address: DataTypes.STRING,
-        city: DataTypes.STRING,
-        state: DataTypes.STRING,
-        phone: DataTypes.STRING,
-        createdAt: DataTypes.DATE,
-        updatedAt: DataTypes.DATE,
+        name: {
+            type:DataTypes.STRING, 
+            allowNull: false
+        },
+        address: {
+            type:DataTypes.STRING, 
+            allowNull: false
+        },
+        city: {
+            type: DataTypes.STRING, 
+            allowNull: false
+        },
+        state: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        phone: {
+            type: DataTypes.STRING, 
+            allowNull: false
+        },
     }, {
         sequelize,
         modelName: 'BloodBank',
         tableName: 'blood_bank',
     });
-    // BloodBank.sync({
-    //     force: false,
-    //     alter: true
-    // })
+    BloodBank.sync({force: true, alter: true}).then(() => {
+        console.log('Table and model synced successfully');
+      }).catch((err) => {
+        console.log("Error syncing model and table Blood Bank", err);
+      });
     return BloodBank;
 };

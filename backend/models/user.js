@@ -20,22 +20,31 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4
     },
-    name: DataTypes.STRING,
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+
+    },
     phone: DataTypes.STRING,
     birthDate: DataTypes.DATE,
-    bloodType: DataTypes.STRING,
-    sex: DataTypes.STRING,
+    bloodType: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    sex: {
+      type:DataTypes.STRING,
+      allowNull: false
+    },
     email: DataTypes.STRING,
-    createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'User',
     tableName: 'user'
   });
-  // User.sync({
-  //   alter: true,
-  //   force: true
-  // })
+  User.sync({force: false, alter: false}).then(() => {
+    console.log('Table and model (user) synced successfully');
+  }).catch((err) => {
+    console.log("Error syncing model and table User", err);
+  });
   return User;
 };

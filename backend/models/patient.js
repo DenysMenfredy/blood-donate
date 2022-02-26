@@ -10,7 +10,8 @@ module.exports = (sequelize, DataTypes) => {
                 foreignKey: 'userId',
                 onDelete: 'CASCADE',
                 onUpdate: 'CASCADE',
-                as: 'user'
+                as: 'user',
+                constraints: false
             });
         }
     };
@@ -20,7 +21,12 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             defaultValue: DataTypes.UUIDV4,
         },
-        userId: DataTypes.UUID,
+        userId: {
+            type:DataTypes.UUID,
+            allowNull: false,
+            foreignKey: true,
+
+        },
         reason: DataTypes.TEXT,
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE,
@@ -28,14 +34,15 @@ module.exports = (sequelize, DataTypes) => {
         sequelize,
         modelName: 'Patient',
         tableName: 'patient',
-        // defaultScope: {
-        //     include: 'user'
-        // }
+        defaultScope: {
+            include: 'user'
+        }
     });
-    // Patient.sync({
-    //     force: false,
-    //     alter: true,
-    // });
+    Patient.sync({force: false, alter: false}).then(() => {
+        console.log('Table and model (user) synced successfully');
+      }).catch((err) => {
+        console.log("Error syncing model and table Patient", err);
+      });
     return Patient;
 
 };

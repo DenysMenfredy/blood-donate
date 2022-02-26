@@ -12,6 +12,7 @@ function Donator() {
     const history = useHistory();
     const [userInfo, setInfo] = useState({});
     const [donatorId, setDonatorId] = useState(null);
+    const [userId, setUserId] = useState(null);
     const [patients, setPatients] = useState([]);
     const [numDonations, setNumDonations] = useState('');
     const [authorized, setAuthorized] = useState(false);
@@ -31,6 +32,7 @@ function Donator() {
                 if(response.status === 200) {
                     console.log(response.data);
                     setDonatorId(response.data.donatorId);
+                    setUserId(response.data.userId);
                     setAuthorized(true);
                 } 
             })
@@ -79,7 +81,7 @@ function Donator() {
        });
    });
     console.log('user info:', userInfo);
-
+   console.log('Blood Type:', userInfo.user.bloodType);
 
     function handleLogout(e) {
         e.preventDefault();
@@ -95,7 +97,7 @@ function Donator() {
                 <div className="user-info">
                     <img src={avatar} alt="blood avatar " />
                     <h4>{userInfo.username}</h4>
-                    <h5>Tipo sanguineo: {userInfo.tipo_sanguineo}</h5>
+                    <h5>Tipo sanguineo: {userInfo.user.bloodType}</h5>
                     <span> {numDonations} doações realizadas</span>
                 </div>
                 <div className="divisor" />

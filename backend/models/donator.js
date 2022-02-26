@@ -1,6 +1,6 @@
 'use strict';
 
-const { Model} = require('sequelize');
+const { Model } = require('sequelize');
 
 
 // console.log(db);
@@ -14,8 +14,16 @@ module.exports = (sequelize, DataTypes) => {
                 foreignKey: 'userId',
                 onDelete: 'CASCADE',
                 onUpdate: 'CASCADE',
-                as: 'user'
+                as: 'user',
+                constraints: false
             });
+            // Donator.hasMany(models.Donation, {
+            //     foreignKey: 'donatorId',
+            //     onDelete: 'CASCADE',
+            //     onUpdate: 'CASCADE',
+            //     as: 'donation',
+            //     constraints: false
+            // })
         }
     };
     Donator.init({
@@ -23,24 +31,34 @@ module.exports = (sequelize, DataTypes) => {
             type:DataTypes.UUID,
             primaryKey: true,
             defaultValue: DataTypes.UUIDV4,
+            allowNull: false
         },
-        userId: DataTypes.UUID,
-        username: DataTypes.STRING,
-        password: DataTypes.STRING,
-        createdAt: DataTypes.DATE,
-        updatedAt: DataTypes.DATE,
+        userId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+            foreignKey: true,
+        },
+        username: {
+            type:DataTypes.STRING,
+            allowNull: false,
+        },
+        password: {
+            type:DataTypes.STRING,
+            allowNull: false,
+        },
     }, {
         sequelize,
         modelName: 'Donator',
         tableName: 'donator',
-        // defaultScope: {
-        //     include: 'user'
-        // },
+        defaultScope: {
+            include: 'user'
+        },
     });
-    // Donator.sync({
-    //     force: false,
-    //     alter: true,
-    // });
+    Donator.sync({force: false, alter: false}).then(() => {
+        console.log('Table and model (donator) synced successfully');
+      }).catch((err) => {
+        console.log("Error syncing model and table Donator", err);
+      });
     return Donator;
 
 };

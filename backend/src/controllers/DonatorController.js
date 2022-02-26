@@ -10,35 +10,41 @@ const SECRET_KEY = 'strongUniqueAndRandom';
 module.exports = {
 
     async create(request, response) {
-        console.log(request.body);
+        // console.log(request.body);
         const {nome, dataNascimento, sexo, username, password, telefone, tipo_sanguineo} = request.body;
 	
         // const query = 'CALL insert_doador($1, $2, $3, $4, $5, $6, $7);';
         // const params = [nome, idade, sexo, username, senha, telefone, tipo_sanguineo]
 
-        const user = await db.User.create({
+        const user = db.User.create({
             name: nome,
             birthDate: new Date(dataNascimento),
             sex: sexo,
             bloodType: tipo_sanguineo,
-            phone: telefone
-        });
-        if(user) {
-            // console.log(user);
-            const donator = await db.Donator.create({
+            phone: telefone,
+        }).then((user) => {
+            console.log(user);
+            const donator = db.Donator.create({
                 userId: user.userId,
                 username: username,
                 password: password
+            }).then((donator) => {
+                return response.status(201).json({
+                    message: 'Donator created successfully',
+                    donator: donator
+                });
+            }).catch((err) => {
+                console.log(err);
+                return response.status(500).json({
+                    message: 'Error creating donator'
+                });
+        }).catch((err) => {
+            console.log("Error creating the user", err);
+            return response.status(500).json({
+                message: 'Error creating the user'
             });
-            // console.log('Donator:', donator);
-            if(donator) {
-                // console.log('Donator created');
-                return response.status(201).json(donator);
-            }
-        } else {
-            console.log('User not created');
-            return response.status(500).send('User not created');
-        }        
+        })
+    });      
 
 
     },
@@ -57,8 +63,9 @@ module.exports = {
         if(donator) {
             const token = jwt.sign({
                 donatorId: donator.donatorId,
+                userId: donator.userId,
                 username: donator.username,
-                password: donator.password
+                password: donator.password,
             }, SECRET_KEY, {
                 expiresIn: '1h'
             });
@@ -116,10 +123,10 @@ module.exports = {
                 attributes: ['name', 'birthDate', 'bloodType', 'sex'],
                 // required: true,
             }],
+            attributes: ['donatorId', 'username', 'password'],
             where: {
                 donatorId: donatorId,
             },
-            attributes: ['donatorId', 'username', 'password']
         });
     
             if (donator) {
@@ -127,7 +134,7 @@ module.exports = {
                 return res.status(200).send(donator);
             }
     
-            return res.status(404).send('Donator not found');
+            return res.status(404).json({"message": "Donator not found"});
 
     },
 
@@ -165,6 +172,7 @@ module.exports = {
         return response.status(404).send('Donators not found');
     },
 
+
     // async getDonationsToPatients(request, response) {
     //     const {id} = request.body;
     //     const query = 'SELECT * FROM doacoes_paciente($1);';
@@ -199,6 +207,7 @@ module.exports = {
 
     async numDonations(request, response) {
         const {donatorId} = request.body;
+        
 
         const [donations] = await db.Donation.findAll({
             attributes: [[db.sequelize.fn('COUNT', db.sequelize.col('donationId')), 'numDonations']],

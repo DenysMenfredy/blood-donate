@@ -6,39 +6,47 @@ module.exports = {
         console.log(request.body);
         const {name, birthDate, sex, bloodType, phone, reason} = request.body;
         
-        const user = await db.User.create({
+        const user = db.User.create({
             name: name,
             birthDate: new Date(birthDate),
             sex: sex,
             bloodType: bloodType,
             phone: phone,
-        });
-        if(user) {
-            const patient = await db.Patient.create({
+        }).then((user) => {
+            const patient = db.Patient.create({
                 userId: user.userId,
                 reason: reason
-            });
-            if(patient) {
+            }).then((patient) => {
                 return response.status(201).json({
-                    success: true,
+                    message: 'Patient created successfully',
+                    patient: patient
                 });
-            } else {
+            }).catch((err) => {
+                console.log(err);
                 return response.status(500).json({
-                    success: false,
                     message: 'Error creating patient'
                 });
-            }
-        } else {
+            })
+        }).catch((err) => {
+            console.log("Error creating the user", err);
             return response.status(500).json({
-                error: 'User not created'
+                message: 'Error creating the user'
             });
-        }
+        });
+
     },
 
     async index(request, response) {
         const {patientId} = request.params;
 
         const patient = await db.Patient.findOne({
+            include: [{
+                model: db.User,
+                as: 'user',
+                attributes: ['name', 'birthDate', 'bloodType', 'sex'],
+                // required: true,
+            }],
+            attributes: ['patientId', 'reason'],
             where: {
                 patientId: patientId
             },

@@ -5,6 +5,7 @@ const DonatorController = require('./controllers/DonatorController');
 const PatientController = require('./controllers/PatientController');
 const BloodBankController = require('./controllers/BloodBankController');
 const DonationController = require('./controllers/DonationController');
+const UserController = require('./controllers/UserController');
 const { Router } = require('express');
 const routes = express.Router();
 
@@ -19,6 +20,8 @@ routes.get('/donator/:donatorId', DonatorController.index);
 routes.post('/donator/getId', DonatorController.getId);
 routes.get('/donator', DonatorController.getAll);
 routes.post('/donator/numDonations', DonatorController.numDonations);
+
+routes.get('/user/getBloodType', UserController.getBloodType);
 // routes.post('/donations/patients', DonatorController.getDonationsToPatients);
 // routes.post('/donations/banks', DonatorController.getDonationsToBanks);
 

@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'donationId',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
-        as: 'donation'
+        constraints: false,
       });
       DonationToPatient.hasOne(models.Patient, {
         foreignKey: 'patientId',
@@ -26,7 +26,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   DonationToPatient.init({
-    patientId: DataTypes.UUID,
+    patientId: {
+      type: DataTypes.UUID, 
+      allowNull: false, 
+      foreignKey: true
+    },
     donationId: {
       type:DataTypes.UUID,
       primaryKey: true
@@ -38,6 +42,11 @@ module.exports = (sequelize, DataTypes) => {
     defaultScope: {
       include: ['donation', 'patient']
     }
+  });
+  DonationToPatient.sync({force: true, alter: true}).then(() => {
+    console.log('Table and model synced successfully');
+  }).catch((err) => {
+    console.log("Error syncing model and table Donation to Patient", err);
   });
   return DonationToPatient;
 };

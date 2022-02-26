@@ -25,12 +25,17 @@ function PersonToDonate({patient}) {
 
     }
 
+    function formatDate(date) {
+        date = new Date(date);
+        return date.toLocaleDateString('pt-BR');
+    }
+
         return (
             <div className="person-box">
                 <div className="person-info">
                     <div className="left-info">
                         <h4>Name: {patient.user.name}</h4>
-                        <h4>Birth Date: {patient.user.birthDate}</h4>
+                        <h4>Birth Date: {formatDate(patient.user.birthDate)}</h4>
                         <h4>Reason: {patient.reason}</h4>
                         <input 
                             type="date"

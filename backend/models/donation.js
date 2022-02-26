@@ -14,7 +14,8 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'donatorId',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
-        as: 'donator'
+        as: 'donator',
+        constraints: false
       });
     }
   };
@@ -24,8 +25,15 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4
     },
-    donationDate: DataTypes.DATE,
-    donatorId: DataTypes.UUID,
+    donationDate: {
+      type:DataTypes.DATE, 
+      allowNull: false
+    },
+    donatorId: {
+      type: DataTypes.UUID, 
+      allowNull: false, 
+      foreignKey: true
+    },
     status: {
       type:DataTypes.STRING,
       allowNull: false,
@@ -35,6 +43,11 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'Donation',
     tableName: 'donation',
+  });
+  Donation.sync({force: true, alter: true}).then(() => {
+    console.log('Table and model (donation) synced successfully');
+  }).catch((err) => {
+    console.log("Error syncing model and table Donation", err);
   });
   return Donation;
 };
