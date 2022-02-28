@@ -8,96 +8,72 @@ import avatar from '../../assets/blood-avatar-men.png';
 import {FiEdit, FiLogOut} from 'react-icons/fi';
 import {BiDonateBlood} from 'react-icons/bi';
 
-function Donator() {
+function Donator({authorized, donatorId}) {
+
+    console.log(authorized, donatorId);
+
     const history = useHistory();
     const [userInfo, setInfo] = useState({});
-    const [donatorId, setDonatorId] = useState(null);
-    const [userId, setUserId] = useState(null);
+    
+    // const [userId, setUserId] = useState(null);
     const [patients, setPatients] = useState([]);
     const [numDonations, setNumDonations] = useState('');
-    const [authorized, setAuthorized] = useState(false);
+    
 
     //TODO: rename all this variables to new db names
 
-    function handleTokenValidation() {
-        const token = sessionStorage.getItem('token');
-        const config = {
-            headers: { 
-                'Authorization': `Bearer ${token}`
-            }
-        };
-        api.post('/validate', {}, config)
-            .then((response) => {
-                console.log('auth:', response.data);
-                if(response.status === 200) {
-                    console.log(response.data);
-                    setDonatorId(response.data.donatorId);
-                    setUserId(response.data.userId);
-                    setAuthorized(true);
-                } 
-            })
-            .catch((error) => {
-                console.log('err:', error);
-                history.push('/403');   
-                setAuthorized(false);
-                setTimeout(() => {
-                    history.push('/');
-                }, 5000);
-            });
-    }
-
-    useEffect(() => {
-        handleTokenValidation();
-        if(!authorized) {
-            return;
+    function getData(donatorId) {
+        api.get(`/donator/${donatorId}`).then(response => {
+            if (response.status === 200){
+                console.log('info:', response.data);
+                setInfo(response.data);
         }
-        api.get(`/donator/${donatorId}`)
-        .then(response => {
-            console.log('info:', response.data);
-            setInfo(response.data);
+        }).catch(error => {
+            console.log('err:', error);
         });
-    }, [donatorId, authorized]);
+    }
+    if(authorized) {
+        getData(donatorId);
+    }
+        
 
    useEffect( () => {
-       if (!authorized) {
-           return
-       }
-        api.get('/patient', {}).then(response => {
-            setPatients(response.data);
-            console.log('patients:', response.data);
-        });
-   });
+       async function loadPatients() {
+           const response = await api.get('/patient');
+           if (response.status === 200) {
+                setPatients(response.data);
+           }
+        }
+        loadPatients();
+   }, []);
 
    useEffect( () => {
-         if (!authorized) {
-             return
-         }
-       api.post('/donator/numDonations', {donatorId})
-       .then(response => {
-            console.log('numDonations:', response.data);
-            setNumDonations(response.data.numDonations);
-       }).catch(error => {
-           throw new Error(error);
-       });
-   });
+         async function loadNumDonations() {
+            const response = await api.post('/donator/numDonations', {donatorId});
+            if (response.status === 200) {
+                    console.log('numDonations:', response.data);
+                    setNumDonations(response.data.numDonations);
+            }
+        }
+        loadNumDonations();
+   }, []);
     console.log('user info:', userInfo);
-   console.log('Blood Type:', userInfo.user.bloodType);
+    // console.log('Blood Type:', userInfo.user.bloodType);
 
     function handleLogout(e) {
         e.preventDefault();
         localStorage.clear();
         sessionStorage.clear();
         history.push('/');
-        setAuthorized(false);
     }
-
+    
     return (
         <section className="container">
             <aside className="left-bar">
                 <div className="user-info">
                     <img src={avatar} alt="blood avatar " />
                     <h4>{userInfo.username}</h4>
-                    <h5>Tipo sanguineo: {userInfo.user.bloodType}</h5>
+                    {/* <h5>Tipo sanguineo: {userInfo.user.bloodType}</h5> */}
                     <span> {numDonations} doações realizadas</span>
                 </div>
                 <div className="divisor" />

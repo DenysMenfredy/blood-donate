@@ -93,7 +93,7 @@ module.exports = {
             try {
                 const decoded = jwt.verify(token, SECRET_KEY);
                 console.log('decoded:', decoded);
-                return res.status(200).json(decoded);
+                return res.status(200).json({status: 'valid token', decoded});
             } catch(err) {
                 return res.status(401).json({
                     cod: '401',
@@ -115,8 +115,8 @@ module.exports = {
         // TODO: fix association to return user information
         // console.log(req.params);
         const {donatorId} = req.params;
-        // console.log(donatorId);
-        const donator = await db.Donator.findOne({
+        // console.log('Indexing from ID:', donatorId);
+        const donator = db.Donator.findOne({
             include: [{
                 model: db.User,
                 as: 'user',
@@ -127,14 +127,16 @@ module.exports = {
             where: {
                 donatorId: donatorId,
             },
+        }).then((donator) => {
+            return res.status(200).json({
+                donator
+            });
+        }).catch((err) => {
+            console.log(err);
+            return res.status(500).json({
+                message: 'Error getting donator'
+            });
         });
-    
-            if (donator) {
-                // console.log(donator);
-                return res.status(200).send(donator);
-            }
-    
-            return res.status(404).json({"message": "Donator not found"});
 
     },
 
