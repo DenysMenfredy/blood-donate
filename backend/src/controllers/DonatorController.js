@@ -88,7 +88,6 @@ module.exports = {
         const bearer = req.headers['x-acess-token'] || req.headers['authorization'];
         const [, token] = bearer.split(' ');
         console.log(token);
-        console.log('bearer:', bearer);
 
         if(token) {
             jwt.verify(token, SECRET_KEY, (err, decoded) => {
@@ -165,7 +164,10 @@ module.exports = {
             return response.status(200).json(donatorId);
         }
 
-        return response.status(404).send('Donator not found');
+        return response.status(404).json({
+            success: false,
+            message: 'Donator not found'
+        });
 
     },
 

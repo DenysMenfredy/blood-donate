@@ -37,11 +37,12 @@ function Login() {
                 } else {
                     // history.push('/403');   
                     setAuthorized(false);
+                    return false;
+
                     // setTimeout(() => {
                     //     history.push('/');
                     // }, 5000);
             }
-                console.log(donatorId);
             })
             .catch((error) => {
                 console.log('err:', error);
@@ -58,6 +59,7 @@ function Login() {
             if (response.status === 200) {
                     sessionStorage.setItem('token', response.data.token);
                     if (handleTokenValidation()) {
+                        console.log('donatorId:', donatorId);
                         history.push({pathname: '/donator', state: {
                             authorized: authorized, 
                             donatorId: donatorId

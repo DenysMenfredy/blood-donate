@@ -4,12 +4,12 @@ const db = require('../../models');
 module.exports = {
     async create(request, response) {
         console.log(request.body);
-        const {name, birthDate, sex, bloodType, phone, reason} = request.body;
+        const {name, birthDate, gender, bloodType, phone, reason} = request.body;
         
         const user = db.User.create({
             name: name,
             birthDate: new Date(birthDate),
-            sex: sex,
+            sex: gender,
             bloodType: bloodType,
             phone: phone,
         }).then((user) => {
