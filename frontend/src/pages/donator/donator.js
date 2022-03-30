@@ -8,33 +8,30 @@ import avatar from '../../assets/blood-avatar-men.png';
 import {FiEdit, FiLogOut} from 'react-icons/fi';
 import {BiDonateBlood} from 'react-icons/bi';
 
-function Donator({authorized, donatorId}) {
-
-    console.log(authorized, donatorId);
+function Donator() {
 
     const history = useHistory();
     const [userInfo, setInfo] = useState({});
+    const donatorId = localStorage.getItem('donatorId');
+    console.log('donatorId:', donatorId);
     
     // const [userId, setUserId] = useState(null);
     const [patients, setPatients] = useState([]);
     const [numDonations, setNumDonations] = useState('');
     
+    function getData() {
+        api.get(`/donator/d/${donatorId}`)
+            .then(response => {
+                console.log('response.data:', response.data);
+                setInfo(response.data);
+            })
+            .catch(error => {
+                console.log('error:', error);
+            })
+    }
+    getData();
 
     //TODO: rename all this variables to new db names
-
-    function getData(donatorId) {
-        api.get(`/donator/${donatorId}`).then(response => {
-            if (response.status === 200){
-                console.log('info:', response.data);
-                setInfo(response.data);
-        }
-        }).catch(error => {
-            console.log('err:', error);
-        });
-    }
-    if(authorized) {
-        getData(donatorId);
-    }
         
 
    useEffect( () => {

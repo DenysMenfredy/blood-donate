@@ -75,8 +75,8 @@ module.exports = {
                 expiresIn: 3600
             });
         } else {
-            return res.status(401).json({
-                cod: '401',
+            return res.status(404).json({
+                cod: '404',
                 message: 'Invalid credentials'
             });
         }

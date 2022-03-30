@@ -20,7 +20,7 @@ function Login() {
 
     function handleTokenValidation() {
         const token = sessionStorage.getItem('token');
-        // console.log('token', token);
+        console.log('token', token);
         const config = {
             headers: { 
                 'Authorization': `Bearer ${token}`
@@ -29,23 +29,14 @@ function Login() {
         api.post('/validate', {}, config)
             .then((response) => {
                 console.log('auth:', response.data);
-                if(response.status === 200) {
-                    console.log('donatorId:', response.data.decoded.donatorId);
-                    setDonatorId(response.data.decoded.donatorId);
-                    setAuthorized(true);
-                    return true;
-                } else {
-                    // history.push('/403');   
-                    setAuthorized(false);
-                    return false;
-
-                    // setTimeout(() => {
-                    //     history.push('/');
-                    // }, 5000);
-            }
+                localStorage.setItem('donatorId', response.data.decoded.donatorId);
+                setAuthorized(true);
+                
             })
             .catch((error) => {
                 console.log('err:', error);
+                setAuthorized(false);
+                // return false;
             })
             
     }
@@ -53,34 +44,25 @@ function Login() {
 
     async function handleLogin(e) {
         e.preventDefault();
-        
-        try {
-            const response = await api.post('/login', {username, password});
-            if (response.status === 200) {
-                    sessionStorage.setItem('token', response.data.token);
-                    if (handleTokenValidation()) {
-                        console.log('donatorId:', donatorId);
-                        history.push({pathname: '/donator', state: {
-                            authorized: authorized, 
-                            donatorId: donatorId
-                        }});
-                    } else {
-                        history.push('/403');
-                        setTimeout( () => {
-                            history.push('/');
-                        }, 5000);
-                    }
-                } else {
-                    sessionStorage.removeItem('token');
-                    alert('username or password incorrect.');
+    
+        const response = await api.post('/login', {username, password});
+        console.log('response:', response);
+        if (response) {
+                sessionStorage.setItem('token', response.data.token);
+                handleTokenValidation();
+                if (authorized) {
+                    console.log('Token validated | donatorId:', donatorId);
+                    history.push('/donator');
                 }
-
-            } catch (error) {
-                console.log('err:', error);
-                alert('Failed to login. Please try again.');
+        } else {
+                console.log('Token not validated');
+                history.push('/403');
+                setTimeout( () => {
+                    history.push('/');
+                }, 5000);
             }
+    }
             
-        }
         
 
     

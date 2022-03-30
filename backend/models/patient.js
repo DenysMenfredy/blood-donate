@@ -6,13 +6,13 @@ module.exports = (sequelize, DataTypes) => {
     class Patient extends Model {
 
         static associate(models) {
-            // Patient.belongsTo(models.User, {
-            //     foreignKey: 'userId',
-            //     onDelete: 'CASCADE',
-            //     onUpdate: 'CASCADE',
-            //     as: 'user',
-            //     constraints: false
-            // });
+            Patient.belongsTo(models.User, {
+                foreignKey: 'userId',
+                onDelete: 'CASCADE',
+                onUpdate: 'CASCADE',
+                as: 'user',
+                constraints: false
+            });
         }
     };
     Patient.init({
@@ -38,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
             include: 'user'
         }
     });
-    Patient.sync({force: false, alter: false}).then(() => {
+    Patient.sync({force: false, alter: true}).then(() => {
         console.log('Table and model (user) synced successfully');
       }).catch((err) => {
         console.log("Error syncing model and table Patient", err);
