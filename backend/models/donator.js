@@ -17,13 +17,13 @@ module.exports = (sequelize, DataTypes) => {
                 as: 'user',
                 constraints: false
             });
-            // Donator.hasMany(models.Donation, {
-            //     foreignKey: 'donatorId',
-            //     onDelete: 'CASCADE',
-            //     onUpdate: 'CASCADE',
-            //     as: 'donation',
-            //     constraints: false
-            // })
+            Donator.hasMany(models.Donation, {
+                foreignKey: 'donatorId',
+                onDelete: 'CASCADE',
+                onUpdate: 'CASCADE',
+                as: 'donation',
+                constraints: false
+            })
         }
     };
     Donator.init({
@@ -54,7 +54,7 @@ module.exports = (sequelize, DataTypes) => {
             include: 'user'
         },
     });
-    Donator.sync({force: false, alter: false}).then(() => {
+    Donator.sync({force: false, alter: true}).then(() => {
         console.log('Table and model (donator) synced successfully');
       }).catch((err) => {
         console.log("Error syncing model and table Donator", err);

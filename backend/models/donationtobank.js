@@ -40,11 +40,11 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'DonationToBank',
     tableName: 'donation_to_bank',
-    // defaultScope: {
-    //   include: ['donation', 'bloodBank']
-    // }
+    defaultScope: {
+      include: ['donation', 'bloodBank']
+    }
   });
-  DonationToBank.sync({force: false, alter: true}).then(() => {
+  DonationToBank.sync({force: false, alter: false}).then(() => {
     console.log('Table and model synced successfully');
   }).catch((err) => {
     console.log("Error syncing model and table Donation to Bank", err);

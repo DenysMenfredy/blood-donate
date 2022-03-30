@@ -43,6 +43,9 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'Donation',
     tableName: 'donation',
+    defaultScope: {
+      include: 'donator'
+    }
   });
   Donation.sync({force: false, alter: false}).then(() => {
     console.log('Table and model (donation) synced successfully');

@@ -16,7 +16,7 @@ routes.get('/', (req, res) => {
 })
 
 routes.post('/donator', DonatorController.create);
-routes.get('/donator/:donatorId', DonatorController.index);
+routes.get('/donator/d/:donatorId', DonatorController.index);
 routes.post('/donator/getId', DonatorController.getId);
 routes.get('/donator', DonatorController.getAll);
 routes.post('/donator/numDonations', DonatorController.numDonations);

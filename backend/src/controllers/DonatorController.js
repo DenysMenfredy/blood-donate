@@ -11,17 +11,17 @@ module.exports = {
 
     async create(request, response) {
         // console.log(request.body);
-        const {nome, dataNascimento, sexo, username, password, telefone, tipo_sanguineo} = request.body;
+        const {name, birthDate, gender, username, password, phone, bloodType} = request.body;
 	
         // const query = 'CALL insert_doador($1, $2, $3, $4, $5, $6, $7);';
         // const params = [nome, idade, sexo, username, senha, telefone, tipo_sanguineo]
 
         const user = db.User.create({
-            name: nome,
-            birthDate: new Date(dataNascimento),
-            sex: sexo,
-            bloodType: tipo_sanguineo,
-            phone: telefone,
+            name: name,
+            birthDate: new Date(birthDate),
+            sex: gender,
+            bloodType: bloodType,
+            phone: phone,
         }).then((user) => {
             console.log(user);
             const donator = db.Donator.create({
@@ -85,28 +85,32 @@ module.exports = {
 
     async validate(req, res) {
         // console.log(req.headers);
-        const bearer = req.headers.authorization;
+        const bearer = req.headers['x-acess-token'] || req.headers['authorization'];
         const [, token] = bearer.split(' ');
+        console.log(token);
         console.log('bearer:', bearer);
 
         if(token) {
-            try {
-                const decoded = jwt.verify(token, SECRET_KEY);
-                console.log('decoded:', decoded);
-                return res.status(200).json({status: 'valid token', decoded});
-            } catch(err) {
-                return res.status(401).json({
-                    cod: '401',
-                    message: 'Invalid token'
+            jwt.verify(token, SECRET_KEY, (err, decoded) => {
+                if (err) {
+                    return res.status(401).json({
+                        success: false,
+                        message: 'Token invalid'
+                    })
+                }
+                return res.status(200).json({
+                    success: true,
+                    message: 'Token valid',
+                    decoded
                 });
-            }
+
+            });
+        } else {
+            return res.status(401).json({
+                success: false,
+                message: 'Token not provided'
+            });
         }
-
-        return res.status(401).json({
-            cod: '401',
-            message: 'Invalid token'
-        });
-
 
     },
 
@@ -115,8 +119,14 @@ module.exports = {
         // TODO: fix association to return user information
         // console.log(req.params);
         const {donatorId} = req.params;
+        const uuid4Pattern = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+        if (!String(donatorId).match(uuid4Pattern)) {
+            return res.status(400).json({
+                message: 'Invalid donatorId. Must be a valid UUID4'
+            });
+        }
         // console.log('Indexing from ID:', donatorId);
-        const donator = db.Donator.findOne({
+        const donator = await db.Donator.findOne({
             include: [{
                 model: db.User,
                 as: 'user',
@@ -127,17 +137,17 @@ module.exports = {
             where: {
                 donatorId: donatorId,
             },
-        }).then((donator) => {
+        });
+        // console.log('donator:', donator);
+        if (donator) {
             return res.status(200).json({
                 donator
-            });
-        }).catch((err) => {
-            console.log(err);
-            return res.status(500).json({
-                message: 'Error getting donator'
-            });
+        })};
+        
+        return res.status(404).json({
+            message: 'Donator not found'
         });
-
+        
     },
 
     async getId(request, response) {

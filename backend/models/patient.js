@@ -6,13 +6,13 @@ module.exports = (sequelize, DataTypes) => {
     class Patient extends Model {
 
         static associate(models) {
-            Patient.belongsTo(models.User, {
-                foreignKey: 'userId',
-                onDelete: 'CASCADE',
-                onUpdate: 'CASCADE',
-                as: 'user',
-                constraints: false
-            });
+            // Patient.belongsTo(models.User, {
+            //     foreignKey: 'userId',
+            //     onDelete: 'CASCADE',
+            //     onUpdate: 'CASCADE',
+            //     as: 'user',
+            //     constraints: false
+            // });
         }
     };
     Patient.init({
