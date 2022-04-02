@@ -12,27 +12,49 @@ function Donator() {
 
     const history = useHistory();
     const [userInfo, setInfo] = useState({});
-    const donatorId = localStorage.getItem('donatorId');
+    const [donatorId, setDonatorId] = useState(null);
     console.log('donatorId:', donatorId);
     
     // const [userId, setUserId] = useState(null);
     const [patients, setPatients] = useState([]);
     const [numDonations, setNumDonations] = useState('');
     
-    function getData() {
-        api.get(`/donator/d/${donatorId}`)
-            .then(response => {
-                console.log('response.data:', response.data);
-                setInfo(response.data);
-            })
-            .catch(error => {
-                console.log('error:', error);
-            })
+    async function validateUser() {
+        const token = localStorage.getItem('access_token');
+        console.log('token:', token);
+        if(token) {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Application: 'application/json'
+            }}
+            const response = await api.post('/validate', {}, config);
+            console.log('response:', response);
+            if(response.status === 200) {
+                setDonatorId(response.data.decoded.donatorId);
+                return true;
+            }
+            return false;
+        }
+        return false;
     }
-    getData();
 
-    //TODO: rename all this variables to new db names
-        
+    async function getUserInfo() {
+        const response = await api.get(`/donator/d/${donatorId}`);
+        console.log('donator:', response.data);
+        if(response.status === 200) {
+            setInfo(response.data);
+        }
+    }
+
+    useEffect(() => {
+        if(!validateUser()) {
+            console.log('User not authorized');
+            history.push('/403');
+        }
+        console.log('User authorized');
+        getUserInfo();
+    } , [donatorId]);
 
    useEffect( () => {
        async function loadPatients() {
@@ -44,16 +66,16 @@ function Donator() {
         loadPatients();
    }, []);
 
-   useEffect( () => {
-         async function loadNumDonations() {
-            const response = await api.post('/donator/numDonations', {donatorId});
-            if (response.status === 200) {
-                    console.log('numDonations:', response.data);
-                    setNumDonations(response.data.numDonations);
-            }
-        }
-        loadNumDonations();
-   }, []);
+//    useEffect( () => {
+//          async function loadNumDonations() {
+//             const response = await api.post('/donator/numDonations', {donatorId});
+//             if (response.status === 200) {
+//                     console.log('numDonations:', response.data);
+//                     setNumDonations(response.data.numDonations);
+//             }
+//         }
+//         loadNumDonations();
+//    }, []);
     console.log('user info:', userInfo);
     // console.log('Blood Type:', userInfo.user.bloodType);
 

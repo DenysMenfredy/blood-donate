@@ -67,7 +67,7 @@ module.exports = {
                 username: donator.username,
                 password: donator.password,
             }, SECRET_KEY, {
-                expiresIn: '1h'
+                expiresIn: '2h'
             });
             return res.status(200).json({
                 message: 'Logged in',
@@ -87,7 +87,7 @@ module.exports = {
         // console.log(req.headers);
         const bearer = req.headers['x-acess-token'] || req.headers['authorization'];
         const [, token] = bearer.split(' ');
-        console.log(token);
+        // console.log(token);
 
         if(token) {
             jwt.verify(token, SECRET_KEY, (err, decoded) => {

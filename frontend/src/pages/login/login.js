@@ -18,55 +18,24 @@ function Login() {
     const history = useHistory();
 
 
-    function handleTokenValidation() {
-        const token = sessionStorage.getItem('token');
-        console.log('token', token);
-        const config = {
-            headers: { 
-                'Authorization': `Bearer ${token}`
-            }
-        };
-        api.post('/validate', {}, config)
-            .then((response) => {
-                console.log('auth:', response.data);
-                localStorage.setItem('donatorId', response.data.decoded.donatorId);
-                setAuthorized(true);
-                
-            })
-            .catch((error) => {
-                console.log('err:', error);
-                setAuthorized(false);
-                // return false;
-            })
-            
-    }
-
-
     async function handleLogin(e) {
         e.preventDefault();
-    
         const response = await api.post('/login', {username, password});
         console.log('response:', response);
-        if (response) {
-                sessionStorage.setItem('token', response.data.token);
-                handleTokenValidation();
-                if (authorized) {
-                    console.log('Token validated | donatorId:', donatorId);
-                    history.push('/donator');
-                }
-        } else {
-                console.log('Token not validated');
-                history.push('/403');
-                setTimeout( () => {
-                    history.push('/');
-                }, 5000);
-            }
+        if (response.status === 200) {
+            setDonatorId(response.data.donatorId);
+            setAuthorized(true);
+            localStorage.setItem('access_token', response.data.token);
+            // localStorage.setItem('donatorId', response.data.donatorId);
+            history.push('/donator');
+        }
+        if(!response){
+            alert('Login failed');
+        }
+
     }
-            
-        
-
     
-
+    
     return (
         <section className="login-container">
             <div className="left-half">
