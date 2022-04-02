@@ -12,36 +12,64 @@ function Donations() {
     const history = useHistory();
     const [donations, setDonations] = useState([]);
     const [userInfo, setInfo] = useState('');
-    const donatorId = localStorage.getItem('donatorId');
-    const username = localStorage.getItem('username');
+    const [donatorId, setDonatorId] = useState(null);
     const [numDonations, setNumDonations] = useState('');
 
+
+    async function validateUser() {
+        const token = localStorage.getItem('access_token');
+        // console.log('token:', token);
+        if(token) {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Application: 'application/json'
+            }}
+            api.post('/validate', {}, config)
+            .then(response => {
+                console.log('response from route validate:', response);
+                setDonatorId(response.data.decoded.donatorId);
+            }).catch(error => {
+                console.log('error from route validate:', error);
+                history.push('/403');
+            });   
+        }
+    }
+
+    async function getUserInfo() {
+        api.get(`/donator/d/${donatorId}`)
+        .then(response => {
+            // console.log('response from getUserInfo:', response);
+            setInfo(response.data.donator);
+        }).catch(error => {
+            console.log('error from getUserInfo:', error);
+        })
+    }
+
     useEffect(() => {
-        api.get('/donator', { 
-            headers: { 
-                Authorization: username
-            }
-        }).then(response => {
-            setInfo(response.data);
-        });
-    }, [username]);
+        validateUser();
+    }, []);
+
+    useEffect(() => {
+        getUserInfo();
+    }, );
 
     useEffect( () => {
-        api.post('/donations/patients', {id:donatorId}).then(response => {
-            if (response.status === 200){
-                setDonations(response.data);
-            } else if(response.status === 204) {
-                console.log("Não foram encontradas doações pacientes realizadas por este usuário...");
-            }   
+        api.get('/donation/patient', {id:donatorId}).then(response => {
+                setDonations(response.data.donations);
             // console.log(response.data);
-        });
+        }).catch(error => {
+            console.log(error);
+        })
    });
 
-   useEffect( () => {
-    api.post('/donator/numDonations', {donatorId}).then(response => {
-         setNumDonations(response.data.num_donations);
-    });
-});
+//    useEffect( () => {
+//         api.post('/donator/numDonations', {donatorId}).then(response => {
+//             setNumDonations(response.data.num_donations);
+//         });
+//     });
+
+    console.log('donations:', donations);
 
     function handleLogout(e) {
         e.preventDefault();
@@ -92,7 +120,7 @@ function Donations() {
                 <div className="donation-to-patient">
                     <h1>Doações realizadas para pacientes</h1>
                     <div className="search-results">
-                        <DonationToPatient donations={donations}/>
+                        {donations && <DonationToPatient donations={donations}/> }
                     </div>
                 </div>
 

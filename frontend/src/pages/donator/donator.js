@@ -21,41 +21,41 @@ function Donator() {
     
     async function validateUser() {
         const token = localStorage.getItem('access_token');
-        console.log('token:', token);
+        // console.log('token:', token);
         if(token) {
             const config = {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     Application: 'application/json'
             }}
-            const response = await api.post('/validate', {}, config);
-            console.log('response:', response);
-            if(response.status === 200) {
+            api.post('/validate', {}, config)
+            .then(response => {
+                console.log('response from route validate:', response);
                 setDonatorId(response.data.decoded.donatorId);
-                return true;
-            }
-            return false;
+            }).catch(error => {
+                console.log('error from route validate:', error);
+                history.push('/403');
+            });   
         }
-        return false;
     }
 
     async function getUserInfo() {
-        const response = await api.get(`/donator/d/${donatorId}`);
-        console.log('donator:', response.data);
-        if(response.status === 200) {
-            setInfo(response.data);
-        }
+        api.get(`/donator/d/${donatorId}`)
+        .then(response => {
+            // console.log('response from getUserInfo:', response);
+            setInfo(response.data.donator);
+        }).catch(error => {
+            console.log('error from getUserInfo:', error);
+        })
+
     }
 
     useEffect(() => {
-        if(!validateUser()) {
-            console.log('User not authorized');
-            history.push('/403');
-        }
-        console.log('User authorized');
+        validateUser();
+    }, []);
+    useEffect(() => {
         getUserInfo();
-    } , [donatorId]);
-
+    },);
    useEffect( () => {
        async function loadPatients() {
            const response = await api.get('/patient');
@@ -64,7 +64,7 @@ function Donator() {
            }
         }
         loadPatients();
-   }, []);
+   },);
 
 //    useEffect( () => {
 //          async function loadNumDonations() {
@@ -77,6 +77,7 @@ function Donator() {
 //         loadNumDonations();
 //    }, []);
     console.log('user info:', userInfo);
+    console.log('user', userInfo.user);
     // console.log('Blood Type:', userInfo.user.bloodType);
 
     function handleLogout(e) {
@@ -91,8 +92,8 @@ function Donator() {
             <aside className="left-bar">
                 <div className="user-info">
                     <img src={avatar} alt="blood avatar " />
-                    <h4>{userInfo.username}</h4>
-                    {/* <h5>Tipo sanguineo: {userInfo.user.bloodType}</h5> */}
+                    {userInfo.user && <h4>{userInfo.user.name}</h4>}
+                    {userInfo.user && <h5>Tipo sanguineo: {userInfo.user.bloodType}</h5> }
                     <span> {numDonations} doações realizadas</span>
                 </div>
                 <div className="divisor" />
