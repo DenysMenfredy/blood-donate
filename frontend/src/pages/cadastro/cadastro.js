@@ -12,46 +12,34 @@ function Cadastro() {
 
     const history = useHistory();
 
-    const [nome, setNome] = useState('');
-    const [dataNascimento, setIdade] = useState('');
-    const [sexo, setSexo] = useState('');
+    const [name, setName] = useState('');
+    const [birthDate, setBirthDate] = useState('');
+    const [gender, setGender] = useState('');
     const [username, setUsername] = useState('');
-    const [senha, setSenha] = useState('');
-    const [telefone, setTelefone] = useState('');
-    const [tipo_sanguineo, setTipoSanguineo] = useState('');
+    const [password, setPassword] = useState('');
+    const [phone, setPhone] = useState('');
+    const [bloodType, setBloodType] = useState('');
 
     async function handleCadastro(e) {
-        e.preventDefault();
-        try { 
-            await api.post('/donator', {
-                nome, 
-                dataNascimento, 
-                sexo, 
-                username,
-                senha,
-                telefone,
-                tipo_sanguineo
-            }).then( (response) => {
-                if (response.status === 200) {
-                    api.post('/login', {username, password:senha})
-                    .then( (response) => {
-                        if (response.status === 200) {
-                            // const response = await api.post('/donator/getId', {username});
-                            localStorage.setItem('donatorId', response.data.userInfo.id);
-                            localStorage.setItem('username', response.data.userInfo.username);
-                            history.push('/donator');
-                        }
-                        // const donatorId = response.data.id_doador;
-                    })
-                }
-            })
-            // console.log(donatorId);
-
-            // history.push('/donator');
-        }catch(err) {
-            console.log("Falha ao cadastrar doador");
-        }
-
+        e.preventDefault(); 
+        await api.post('/donator', {
+            name, 
+            birthDate, 
+            gender, 
+            username,
+            password,
+            phone,
+            bloodType
+        }).then( (response) => {
+            console.log(response.data);
+            alert('Succefully registered!');
+            setTimeout(() => {
+                history.push('/');
+            }, 2000);
+        }).catch( (error) => {
+            console.log(error);
+            alert('Error registering!');
+        });
     }
 
     return (
@@ -59,62 +47,63 @@ function Cadastro() {
             <div className="lh">
                 <img src={logoLarge} alt="logo blood-donate" />
             </div>
-            <div class="back-to-login">
+            <div className="back-to-login">
                 <Link to="/">Back to Login</Link>
             </div>
             <div className="rh">
                 <div className="cad-section">
-                <h1>Crie uma conta agora e salve vidas!</h1>
+                <h1>Create an account now and save lifes!</h1>
                 <form onSubmit={handleCadastro}>
-                <h4>Informações Pessoais</h4>
-                    <div input-name>
+                <h4>Personal Information</h4>
+                    <div className="input-name">                        
                         <input 
                             type="text" 
-                            placeholder="insira seu nome"
-                            value={nome}
-                            onChange={e => setNome(e.target.value)}
+                            placeholder="type your name"
+                            value={name}
+                            onChange={e => setName(e.target.value)}
                             required
                          />
                     </div>
 
-                    <div input-age>
+                    <div className="input-age">
                         <input 
                             type="date" 
-                            placeholder="insira sua data de nascimento"
-                            value={dataNascimento}
-                            parse={value => !value ? null : Number(value)}
-                            onChange={e => setIdade(e.target.value)}
+                            placeholder="your birth date"
+                            value={birthDate}
+                            // parse={value => !value ? null : Number(value)}
+                            onChange={e => setBirthDate(e.target.value)}
                             required
                          />
                     </div>
-                    <div classname="input-fone">
+                    <div className="input-fone">
                         <input
                             type="number"
-                            placeholder="Insira um telefone para contato"
-                            value={telefone}
-                            onChange={e => setTelefone(e.target.value)}
+                            placeholder="Insert a phone number"
+                            value={phone}
+                            onChange={e => setPhone(e.target.value)}
                             required
                         />
                     </div>
-                    <div input-gender>
-                        <label for="gender">Informe seu sexo</label> 
+                    <div className="input-gender">
+                        <label htmlFor="gender">Insert your gender</label> 
                             <select 
                                     name="gender" 
                                     id="gender" 
-                                    value={sexo} 
-                                    onChange={e => setSexo(e.target.value)}
+                                    value={gender} 
+                                    onChange={e => setGender(e.target.value)}
                                     required>
-                                <option value="M">Masculino</option>
-                                <option value="F">Feminino</option>
+                                <option value="M">Man</option>
+                                <option value="W">Women</option>
+                                {/* <option value="X">No </option> */}
                             </select>
                     </div>
 
-                    <div input-blood>
-                        <label for="blood">Informe seu tipo sanguineo</label> 
+                    <div className="input-blood">
+                        <label htmlFor="blood">Insert your blood type</label> 
                             <select name="blood" 
                                     id="blood" 
-                                    value={tipo_sanguineo} 
-                                    onChange={e => setTipoSanguineo(e.target.value)}
+                                    value={bloodType} 
+                                    onChange={e => setBloodType(e.target.value)}
                                     required>
                                 <option value="A+">A+</option>
                                 <option value="A-">A-</option>
@@ -126,26 +115,26 @@ function Cadastro() {
                                 <option value="O-">O-</option>
                             </select>
                     </div>
-                    <h4>Informações de Login</h4>
-                    <div input-username>
+                    <h4>Login Information</h4>
+                    <div className="input-username">
                         <input 
                             type="text" 
-                            placeholder="insira seu nome de usuário"
+                            placeholder="Insert your username"
                             value={username}
                             onChange={e => setUsername(e.target.value)}
                             required
                          />
                     </div>
-                    <div input-password>
+                    <div className="input-password">
                         <input 
                             type="password" 
-                            placeholder="insira sua senha"
-                            value={senha}
-                            onChange={e => setSenha(e.target.value)}
+                            placeholder="Insert your password"
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
                             required
                          />
                     </div>
-                    <button type="submit">Cadastrar-se</button>
+                    <button type="submit">Register</button>
                 </form>
                 </div>
             </div>
