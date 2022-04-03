@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {useHistory} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import api from '../../services/api';
 
@@ -57,6 +58,9 @@ function Cadastro() {
         <section className="cad-container">
             <div className="lh">
                 <img src={logoLarge} alt="logo blood-donate" />
+            </div>
+            <div class="back-to-login">
+                <Link to="/">Back to Login</Link>
             </div>
             <div className="rh">
                 <div className="cad-section">

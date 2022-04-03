@@ -120,11 +120,24 @@ module.exports = {
     },
 
     async donationsToPatients(request, response) {
+        const {donatorId} = request.body;
+        console.log(donatorId);
+
         const donations = await db.DonationToPatient.findAll({
+            attributes: ['donationId', 'patientId'],
             include: [{
                 model: db.Donation,
                 as: 'donation',
-                attributes: ['donationId', 'donationDate', 'donatorId', 'status'],
+                attributes: ['donationDate', 'status'],
+            }, {
+                model: db.Patient,
+                as: 'patient',
+                attributes: ['patientId', 'userId'],
+                include: [{
+                    model: db.User,
+                    as: 'user',
+                    attributes: ['name', 'email', 'phone'],
+                }]
             }]
         });
         if(!donations) {

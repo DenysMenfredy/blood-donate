@@ -21,12 +21,34 @@ div {
 }
 
 .lh {
-    flex: 1;
+    /* flex: 1; */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
 }
 
 .lh img {
     width: 350px;
     align-self: center;
+}
+
+.back-to-login {
+    /* align-self: flex-end; */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.back-to-login a {
+    background-color: #F05454;
+    color: #ffffff;
+    padding: 10px;
+    text-decoration: none;
+    font-size: 18px;
 }
 
 .rh {

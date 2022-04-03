@@ -55,7 +55,7 @@ function Donations() {
     }, );
 
     useEffect( () => {
-        api.get('/donation/patient', {id:donatorId}).then(response => {
+        api.get('/donation/patient', {donatorId:donatorId}).then(response => {
                 setDonations(response.data.donations);
             // console.log(response.data);
         }).catch(error => {
