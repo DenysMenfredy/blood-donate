@@ -46,10 +46,11 @@ function Cadastro() {
         <section className="cad-container">
             <div className="lh">
                 <img src={logoLarge} alt="logo blood-donate" />
+                <div className="back-to-login">
+                    <Link to="/">Back to Login</Link>
+                </div>
             </div>
-            <div className="back-to-login">
-                <Link to="/">Back to Login</Link>
-            </div>
+
             <div className="rh">
                 <div className="cad-section">
                 <h1>Create an account now and save lifes!</h1>
