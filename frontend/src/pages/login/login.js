@@ -22,17 +22,17 @@ function Login() {
         e.preventDefault();
         const response = await api.post('/login', {username, password});
         console.log('response:', response);
-        if (response.status === 200) {
+        if (response.data.code === 200) {
             setDonatorId(response.data.donatorId);
             setAuthorized(true);
             localStorage.setItem('access_token', response.data.token);
             // localStorage.setItem('donatorId', response.data.donatorId);
             history.push('/donator');
+        } else if (response.data.code === 204) {
+            alert('User and password do not match');
+        } else {
+            alert('There was an error');
         }
-        if(!response){
-            alert('Login failed');
-        }
-
     }
     
     
@@ -49,12 +49,12 @@ function Login() {
 
             <div className="right-half">
                 <div className="login-section">
-                    <h1>Entre e doe sangue</h1>
+                    <h1>Log in and save lifes</h1>
                     <form onSubmit={handleLogin}>
                         <div className="user-input">
                             <input 
                                 type="text" 
-                                placeholder="Insira o nome de usuário" 
+                                placeholder="Insert your username" 
                                 required
                                 value={username}
                                 onChange={e => setUsername(e.target.value)}
@@ -63,7 +63,7 @@ function Login() {
                         <div className="password-input">
                             <input 
                                 type="password" 
-                                placeholder="Insira sua senha" 
+                                placeholder="Insert your password" 
                                 required
                                 value={password}
                                 onChange={e => setPassword(e.target.value)}
@@ -71,8 +71,8 @@ function Login() {
                         </div>
                         <button type="submit" className="login-btn">Login</button>
                     </form>
-                        <span className="link-create-account">Não pussui uma conta? 
-                        <Link to="/cadastro"> Cadastre-se agora </Link></span>
+                        <span className="link-create-account">Doesn't have an account? 
+                        <Link to="/cadastro"> Register now </Link></span>
                 </div>
             </div>
         </section>

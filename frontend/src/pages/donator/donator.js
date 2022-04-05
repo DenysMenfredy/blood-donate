@@ -30,20 +30,38 @@ function Donator() {
             }}
             api.post('/validate', {}, config)
             .then(response => {
-                console.log('response from route validate:', response);
-                setDonatorId(response.data.decoded.donatorId);
+                if(response.data.code === 200) {
+                    console.log('response from route validate:', response);
+                    setDonatorId(response.data.decoded.donatorId);
+                } else if (response.data.code === 401) {
+                    console.log('unauthorized');
+                    history.push('/403');
+                    setTimeout( () => {
+                        history.push('/');
+                    }, 3000);
+                }
             }).catch(error => {
                 console.log('error from route validate:', error);
                 history.push('/403');
             });   
+        } else {
+            console.log('no token');
+            history.push('/403');
+                setTimeout( () => {
+                    history.push('/');
+            }, 3000);
         }
     }
 
     async function getUserInfo() {
         api.get(`/donator/d/${donatorId}`)
         .then(response => {
-            // console.log('response from getUserInfo:', response);
-            setInfo(response.data.donator);
+            console.log('response from getUserInfo:', response);
+            if (response.data.code === 200) {
+                setInfo(response.data.donator);
+            } else if (response.data.code === 204) {
+                console.log('no user found');
+            }
         }).catch(error => {
             console.log('error from getUserInfo:', error);
         })
@@ -54,8 +72,10 @@ function Donator() {
         validateUser();
     }, []);
     useEffect(() => {
-        getUserInfo();
-    },);
+        if(donatorId) {
+            getUserInfo();
+        }
+    }, [donatorId]);
    useEffect( () => {
        async function loadPatients() {
            const response = await api.get('/patient');
@@ -64,7 +84,7 @@ function Donator() {
            }
         }
         loadPatients();
-   },);
+   }, []);
 
 //    useEffect( () => {
 //          async function loadNumDonations() {

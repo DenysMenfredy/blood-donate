@@ -122,7 +122,7 @@ module.exports = {
     async donationsToPatients(request, response) {
         const {donatorId} = request.body;
         console.log(donatorId);
-
+        //FIXME: Returning all donations instead of donations of user with donatorId
         const donations = await db.DonationToPatient.findAll({
             attributes: ['donationId', 'patientId'],
             include: [{
@@ -141,10 +141,14 @@ module.exports = {
             }]
         });
         if(!donations) {
-            return response.status(500).json({status: "error",
-                                              message:"ERRO when getting donations"});
+            return response.send({
+                code: 404,
+                message:"No donations found for this donator"});
         }
-        return response.status(200).json({donations});
+        return response.send({
+            code: 200,
+            donations
+        });
                             
 
     }

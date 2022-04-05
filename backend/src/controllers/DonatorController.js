@@ -60,6 +60,7 @@ module.exports = {
                 password: password
             }
         });
+        console.log('donator:', donator);
         if(donator) {
             const token = jwt.sign({
                 donatorId: donator.donatorId,
@@ -70,13 +71,14 @@ module.exports = {
                 expiresIn: '2h'
             });
             return res.status(200).json({
-                message: 'Logged in',
+                code: 200,
+                message: 'Login successful',
                 token: token,
                 expiresIn: 3600
             });
         } else {
-            return res.status(404).json({
-                cod: '404',
+            return res.send({
+                code: 204,
                 message: 'Invalid credentials'
             });
         }
@@ -92,12 +94,14 @@ module.exports = {
         if(token) {
             jwt.verify(token, SECRET_KEY, (err, decoded) => {
                 if (err) {
-                    return res.status(401).json({
+                    return res.send({
+                        code: 401,
                         success: false,
                         message: 'Token invalid'
                     })
                 }
                 return res.status(200).json({
+                    code: 200,
                     success: true,
                     message: 'Token valid',
                     decoded
@@ -105,7 +109,8 @@ module.exports = {
 
             });
         } else {
-            return res.status(401).json({
+            return res.send({
+                code: 204,
                 success: false,
                 message: 'Token not provided'
             });
@@ -140,10 +145,13 @@ module.exports = {
         // console.log('donator:', donator);
         if (donator) {
             return res.status(200).json({
+                code: 200,
+                message: 'Donator found',
                 donator
         })};
         
-        return res.status(404).json({
+        return res.send({
+            code: 404,
             message: 'Donator not found'
         });
         
@@ -164,7 +172,8 @@ module.exports = {
             return response.status(200).json(donatorId);
         }
 
-        return response.status(404).json({
+        return response.send({
+            code: 404,
             success: false,
             message: 'Donator not found'
         });
@@ -183,7 +192,10 @@ module.exports = {
             return response.status(200).json(donators);
         }
 
-        return response.status(404).send('Donators not found');
+        return response.send({
+            code: 204,
+            donators: []
+        })
     },
 
 

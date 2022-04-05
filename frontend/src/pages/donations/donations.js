@@ -27,12 +27,26 @@ function Donations() {
             }}
             api.post('/validate', {}, config)
             .then(response => {
-                console.log('response from route validate:', response);
-                setDonatorId(response.data.decoded.donatorId);
+                if(response.data.code === 200) {
+                    console.log('response from route validate:', response);
+                    setDonatorId(response.data.decoded.donatorId);
+                } else if (response.data.code === 401) {
+                    console.log('unauthorized');
+                    history.push('/403');
+                    setTimeout( () => {
+                        history.push('/');
+                    }, 3000);
+                }
             }).catch(error => {
                 console.log('error from route validate:', error);
                 history.push('/403');
             });   
+        } else {
+            console.log('no token');
+            history.push('/403');
+                setTimeout( () => {
+                    history.push('/');
+            }, 3000);
         }
     }
 
@@ -52,16 +66,20 @@ function Donations() {
 
     useEffect(() => {
         getUserInfo();
-    }, );
+    }, [donatorId]);
 
     useEffect( () => {
-        api.get('/donation/patient', {donatorId:donatorId}).then(response => {
+        api.get('/donation/patient', {donatorId:donatorId})
+        .then(response => {
+            if (response.data.code === 200) {
                 setDonations(response.data.donations);
-            // console.log(response.data);
+            } else if (response.data.code === 204) {
+                console.log('no donations found');
+            }
         }).catch(error => {
             console.log(error);
         })
-   });
+   }, [donatorId]);
 
 //    useEffect( () => {
 //         api.post('/donator/numDonations', {donatorId}).then(response => {
@@ -119,9 +137,15 @@ function Donations() {
                 </div>
                 <div className="donation-to-patient">
                     <h1>Doações realizadas para pacientes</h1>
-                    <div className="search-results">
-                        {donations && <DonationToPatient donations={donations}/> }
-                    </div>
+                    {donations.length > 0 ? (
+                        <div className="search-results">
+                            {donations && <DonationToPatient donations={donations}/> }
+                        </div>
+                    ) : (
+                        <div className="no-results">
+                            <h2>No donations to patients</h2>
+                        </div>
+                    )}
                 </div>
 
                
