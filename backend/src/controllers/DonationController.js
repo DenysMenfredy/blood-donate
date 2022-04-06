@@ -72,7 +72,7 @@ module.exports = {
 
     async donateToPatient(request, response) {
         const {donatorId, patientId, date} = request.body;
-        // console.log(donatorId, patientId, data);
+        console.log(donatorId, patientId, date);
         
         const donator = await db.Donator.findOne({
             where:{
@@ -81,7 +81,11 @@ module.exports = {
         })
 
         if(!donator) {
-            return response.status(400).json({error: 'Donator not found'});
+            return response.send({
+                code: 404,
+                message: 'Donator not found',
+                sucess: false
+            });
         }
 
         const patient = await db.Patient.findOne({
@@ -91,7 +95,11 @@ module.exports = {
         });
 
         if(!patient) {
-            return response.status(400).json({error: 'Patient not found'});
+            return response.send({
+                code: 404,
+                message: 'Patient not found',
+                sucess: false
+            });
         }
 
         const donation = db.Donation.create({
@@ -103,18 +111,19 @@ module.exports = {
                 patientId,
             }).then((donationToPatient) => {
                 return response.status(201).json({
+                    code: 201,
                     status: 'success',
                     message: 'Donation created successfully',
                     donationToPatient: donationToPatient
                 });
             }).catch((err) => {
                 console.log(err);
-                return response.status(500).json({error: "Error creating donation to patient"});
+                return response.send({
+                    code: 500,
+                    status: 'error',
+                    message: 'Error creating donation to patient'
+                })
             })
-        }).catch((err) => {
-            return response.status(400).json({
-                message: 'Donation not created'
-            });
         })
         
     },

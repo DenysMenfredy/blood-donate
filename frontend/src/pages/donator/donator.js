@@ -33,6 +33,7 @@ function Donator() {
                 if(response.data.code === 200) {
                     console.log('response from route validate:', response);
                     setDonatorId(response.data.decoded.donatorId);
+                    localStorage.setItem('donatorId', response.data.decoded.donatorId);
                 } else if (response.data.code === 401) {
                     console.log('unauthorized');
                     history.push('/403');

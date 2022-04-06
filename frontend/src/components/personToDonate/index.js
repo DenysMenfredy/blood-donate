@@ -6,27 +6,31 @@ import './index.css';
 
 function PersonToDonate({patient}) {
     // console.log(id_doador);
-    const [data, setData] = useState('');
+    const [date, setData] = useState('');
 
-    async function makeDonation(e, patientId, data) { 
+    async function makeDonation(e, patientId, date) { 
         e.preventDefault();
         // console.log(patientId);
-        const idDoador = localStorage.getItem('donatorId');
+        const donatorId = localStorage.getItem('donatorId');
         // localStorage.setItem('PatientId', patient_id);
         // const id_patient = localStorage.getItem('PatientId');
         const response = await api.post('/donation/patient', {
-            donatorId:idDoador, 
+            donatorId:donatorId, 
             patientId:patientId,
-            date:data 
+            date:date 
         });
-        alert(response.data);
+        if (response.data.code === 201) {
+            alert(response.data.message);
+        } else {
+            alert(response.data.message);
+        }
 
         // alert("Button clicked, brô!");
 
     }
 
-    function formatDate(date) {
-        date = new Date(date);
+    function formatDate(birthDate) {
+        let date = new Date(birthDate);
         return date.toLocaleDateString('pt-BR');
     }
 
@@ -40,7 +44,7 @@ function PersonToDonate({patient}) {
                         <input 
                             type="date"
                             id="data"
-                            value={data}
+                            value={date}
                             onChange={e => setData(e.target.value)}    
                             />
                     </div>
@@ -50,7 +54,7 @@ function PersonToDonate({patient}) {
                     </div>
                 </div>
                 <div className="donate-btn">
-                    <button onClick={(e) => makeDonation(e, patient.patientId, data)}>Donate</button>
+                    <button onClick={(e) => makeDonation(e, patient.patientId, date)}>Donate</button>
                 </div>
             </div>
 
