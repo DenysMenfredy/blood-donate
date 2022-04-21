@@ -19,7 +19,7 @@ routes.post('/donator', DonatorController.create);
 routes.get('/donator/d/:donatorId', DonatorController.index);
 routes.post('/donator/getId', DonatorController.getId);
 routes.get('/donator', DonatorController.getAll);
-routes.post('/donator/numDonations', DonatorController.numDonations);
+routes.get('/donator/numDonations', DonatorController.numDonations);
 
 routes.get('/user/getBloodType', UserController.getBloodType);
 // routes.post('/donations/patients', DonatorController.getDonationsToPatients);

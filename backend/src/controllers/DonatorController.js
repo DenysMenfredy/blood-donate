@@ -233,21 +233,22 @@ module.exports = {
 
     async numDonations(request, response) {
         const {donatorId} = request.body;
-        
-
-        const [donations] = await db.Donation.findAll({
-            attributes: [[db.sequelize.fn('COUNT', db.sequelize.col('donationId')), 'numDonations']],
-            where: {
-                donatorId: donatorId
-            },
+        const query = `SELECT * FROM get_num_donations('${donatorId}');`;
+        // console.log(query);
+        const numDonations = await db.sequelize.query(query, {
+            type: db.sequelize.QueryTypes.SELECT,
+            attributes: ['get_num_donations']
         });
 
-        if (donations) {
-            // console.log(donations);
-            return response.status(200).json(donations);
+        if (numDonations) {
+            return response.status(200).json({"numDonations":numDonations[0].get_num_donations});
         }
-        return response.status(404).send('Donations not found');
-            
+
+        return response.send({
+            code: 404,
+            message: 'Donator not found'
+        });
+                    
 
     }
 
