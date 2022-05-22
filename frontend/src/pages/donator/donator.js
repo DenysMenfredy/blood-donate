@@ -87,16 +87,16 @@ function Donator() {
         loadPatients();
    }, []);
 
-//    useEffect( () => {
-//          async function loadNumDonations() {
-//             const response = await api.post('/donator/numDonations', {donatorId});
-//             if (response.status === 200) {
-//                     console.log('numDonations:', response.data);
-//                     setNumDonations(response.data.numDonations);
-//             }
-//         }
-//         loadNumDonations();
-//    }, []);
+   useEffect( () => {
+         async function loadNumDonations() {
+            const response = await api.get('/donator/numDonations', {donatorId});
+            if (response.status === 200) {
+                    console.log('numDonations:', response.data);
+                    setNumDonations(response.data.numDonations);
+            }
+        }
+        loadNumDonations();
+   }, []);
     console.log('user info:', userInfo);
     console.log('user', userInfo.user);
     // console.log('Blood Type:', userInfo.user.bloodType);

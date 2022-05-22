@@ -10,33 +10,87 @@ import {BiDonateBlood} from 'react-icons/bi';
 
 function DonatorBank() {
     const history = useHistory();
-    const [userInfo, setInfo] = useState('');
-    const donatorId = localStorage.getItem('donatorId');
-    const username  = localStorage.getItem('username');
-    const [bancos, setBancos] = useState([]);
+    const [userInfo, setInfo] = useState({});
+    const [donatorId, setDonatorId] = useState(null);
+    const [banks, setBanks] = useState([]);
     const [numDonations, setNumDonations] = useState('');
 
-    useEffect(() => {
-        api.get('donator', { 
-            headers: { 
-                Authorization: username
+    async function validateUser() {
+        const token = localStorage.getItem('access_token');
+        // console.log('token:', token);
+        if(token) {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Application: 'application/json'
+            }}
+            api.post('/validate', {}, config)
+            .then(response => {
+                if(response.data.code === 200) {
+                    console.log('response from route validate:', response);
+                    setDonatorId(response.data.decoded.donatorId);
+                    localStorage.setItem('donatorId', response.data.decoded.donatorId);
+                } else if (response.data.code === 401) {
+                    console.log('unauthorized');
+                    history.push('/403');
+                    setTimeout( () => {
+                        history.push('/');
+                    }, 3000);
+                }
+            }).catch(error => {
+                console.log('error from route validate:', error);
+                history.push('/403');
+            });   
+        } else {
+            console.log('no token');
+            history.push('/403');
+                setTimeout( () => {
+                    history.push('/');
+            }, 3000);
+        }
+    }
+
+    async function getUserInfo() {
+        api.get(`/donator/d/${donatorId}`)
+        .then(response => {
+            console.log('response from getUserInfo:', response);
+            if (response.data.code === 200) {
+                setInfo(response.data.donator);
+            } else if (response.data.code === 204) {
+                console.log('no user found');
             }
-        }).then(response => {
-            setInfo(response.data);
-        });
-    }, [username]);
+        }).catch(error => {
+            console.log('error from getUserInfo:', error);
+        })
+
+    }
+
+    useEffect(() => {
+        validateUser();
+    }, []);
+    useEffect(() => {
+        if(donatorId) {
+            getUserInfo();
+        }
+    }, [donatorId]);
 
    useEffect( () => {
-        api.get('/banco/all').then(response => {
-            setBancos(response.data);
-            // console.log(response.data);
+        api.get('/bank').then(response => {
+            setBanks(response.data);
+            console.log('banks', response.data);
         });
-   });
+   }, []);
 
    useEffect( () => {
-    api.post('/donator/numDonations', {donatorId}).then(response => {
-         setNumDonations(response.data.num_donations);
-    });
+    async function loadNumDonations() {
+       const response = await api.get('/donator/numDonations', {donatorId});
+       console.log('response from loadNumDonations:', response);
+       if (response.status === 200) {
+               console.log('numDonations:', response.data);
+               setNumDonations(response.data.numDonations);
+       }
+   }
+   loadNumDonations();
 });
     // console.log(userInfo);
 
@@ -51,8 +105,8 @@ function DonatorBank() {
             <aside className="left-bar">
                 <div className="user-info">
                     <img src={avatar} alt="blood avatar " />
-                    <h4>{userInfo.nome}</h4>
-                    <h5>Tipo sanguineo: {userInfo.tipo_sanguineo}</h5>
+                    {userInfo.user && <h4>{userInfo.user.name}</h4>}
+                    {userInfo.user && <h5>Tipo sanguineo: {userInfo.user.bloodType}</h5> }
                     <span> {numDonations} doações realizadas</span>
                 </div>
                 <div className="divisor" />
@@ -86,7 +140,7 @@ function DonatorBank() {
                 <div className="donate-to-bank">
                     <h1>Bancos de Sangue disponivéis para doação</h1>
                     <div className="search-results">
-                        <BankToDonate banks={bancos}/>
+                        <BankToDonate banks={banks}/>
                     </div>
 
                     {/* <BankToDonate component here */} 

@@ -72,6 +72,9 @@ module.exports = {
 
     async donateToPatient(request, response) {
         const {donatorId, patientId, date} = request.body;
+        if (!date) {
+            return response.status(400).json({error: 'Date is required'});
+        }
         console.log(donatorId, patientId, date);
         
         const donator = await db.Donator.findOne({
@@ -131,24 +134,13 @@ module.exports = {
     async donationsToPatients(request, response) {
         const {donatorId} = request.body;
         console.log(donatorId);
-        //FIXME: Returning all donations instead of donations of user with donatorId
-        const donations = await db.DonationToPatient.findAll({
-            attributes: ['donationId', 'patientId'],
-            include: [{
-                model: db.Donation,
-                as: 'donation',
-                attributes: ['donationDate', 'status'],
-            }, {
-                model: db.Patient,
-                as: 'patient',
-                attributes: ['patientId', 'userId'],
-                include: [{
-                    model: db.User,
-                    as: 'user',
-                    attributes: ['name', 'email', 'phone'],
-                }]
-            }]
-        });
+        const query = `SELECT * FROM "user" WHERE "userId" IN
+                        (SELECT "userId" FROM patient WHERE "patientId" IN
+                        (SELECT "patientId" FROM donation INNER JOIN donation_to_patient 
+                        ON donation."donationId" = donation_to_patient."donationId" 
+                        WHERE donation."donatorId" = '${donatorId}'))`;
+
+        const donations = await db.sequelize.query(query, { type: db.sequelize.QueryTypes.SELECT });
         if(!donations) {
             return response.send({
                 code: 404,
