@@ -9,3 +9,62 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(100)
+  birthDate DateTime
+  bloodType String   @db.VarChar(10)
+  gender    String   @db.VarChar(20)
+  phone     String   @db.VarChar(20)
+  email     String   @db.VarChar(50)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  donator   Donator?
+  patient   Patient?
+}
+
+model Donator {
+  id        Int        @id @default(autoincrement())
+  user      User       @relation(fields: [userId], references: [id])
+  userId    Int        @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  Donation  Donation[]
+}
+
+model Patient {
+  id        Int        @id @default(autoincrement())
+  user      User       @relation(fields: [userId], references: [id])
+  userId    Int        @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  Donation  Donation[]
+}
+
+model BloodBank {
+  id        Int        @id @default(autoincrement())
+  name      String     @db.VarChar(100)
+  address   String
+  city      String     @db.VarChar(50)
+  state     String     @db.VarChar(50)
+  zipCode   String     @db.VarChar(30)
+  phone     String     @db.VarChar(20)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  Donation  Donation[]
+}
+
+model Donation {
+  donator     Donator   @relation(fields: [donatorId], references: [id])
+  donatorId   Int
+  patient     Patient   @relation(fields: [patientId], references: [id])
+  patientId   Int
+  bloodBank   BloodBank @relation(fields: [bloodBankId], references: [id])
+  bloodBankId Int
+  createdAt   DateTime  @default(now())
+  updateAt    DateTime  @updatedAt
+  reason      String
+
+  @@id([donatorId, patientId, bloodBankId])
+}
